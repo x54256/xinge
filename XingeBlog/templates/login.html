@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.css"/>
+    <link rel="stylesheet" href="/static/css/edmure.css"/>
+    <link rel="stylesheet" href="/static/css/commons.css"/>
+    <link rel="stylesheet" href="/static/css/account.css"/>
+    <style>
+{#        body {#}
+{#            background:url(/static/bg.png);#}
+{#        }#}
+        .errors{
+            color: red;
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+<div class="login">
+    <div style="font-size: 25px; font-weight: bold;text-align: center;">
+        用户登录
+    </div>
+    <form role="form" action="/login.html" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">用户名</label>
+            {{ obj.username }}{{ obj.username.errors.0 }}
+        </div>
+        <div class="form-group">
+            <label for="password">密码</label>
+            {{ obj.password }}{{ obj.password.errors.0 }}
+        </div>
+        <div class="form-group">
+            <label for="password">验证码</label>
+
+            <div class="row">
+                <div class="col-xs-7">
+                    {{ obj.check_code }}{{ obj.check_code.errors.0 }}
+                </div>
+
+                <div class="col-xs-5">
+                    <img src="/check_code.html" onclick="changeCheckCode(this);">
+                    <!-- <img src="/static/imgs/avatar/20130809170025.png"> -->
+                </div>
+            </div>
+
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="checked"> 一个月内自动登陆
+            </label>
+            <div class="right">
+                <a href="在加一个表单就行了">忘记密码？</a>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-default">登 录</button><span class="errors">{{ errors }}</span>
+    </form>
+</div>
+    <script>
+        function changeCheckCode(ths){
+            ths.src = ths.src +  '?';
+
+        }
+    </script>
+</body>
+</html>

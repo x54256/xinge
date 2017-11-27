@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.css"/>
+    <link rel="stylesheet" href="/static/css/edmure.css"/>
+    <link rel="stylesheet" href="/static/css/commons.css"/>
+    <link rel="stylesheet" href="/static/css/row-avatar.css"/>
+    <link rel="stylesheet" href="/static/css/theme/default.css"/>
+
+    <link rel="stylesheet" href="/static/plugins/kindeditor/themes/default/default.css"/>
+    <style>
+        .modules{
+            text-align:center;
+            line-height:200px;
+            position: absolute;
+            top:0;left:0;right:0;bottom: 0;
+            background-color: rgba(255,255,255,.6)
+        }
+        .hide{
+            display:none
+        }
+        .c1{
+            float: right;
+        }
+        .postTitle{
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        a {
+            color: #399ab2;
+            text-decoration: none;
+        }
+        .c2{
+            width: 1349px;
+        }
+
+    </style>
+</head>
+<body style="min-width: 600px;background-color: #dee7de">
+
+<nav class="navbar navbar-default c2" role="navigation" style="background-color:#96b97d;border-radius:0;position: relative">
+    <div class="container-fluid">
+    <div class="navbar-header">
+        <a class="navbar-brand" style="position: absolute;left: 120px;color: white" href="#">{{ obj.username }}</a>
+    </div>
+    </div>
+    <ol class="breadcrumb left" style="border-radius:0;position: absolute;z-index: 11;right:0;top: 12px;background-color:#96b97d;">
+        <li><a href="/">博客园</a></li>
+        <li><a href="#">首页</a></li>
+        <li><a href="#">新随笔</a></li>
+        <li><a href="#">个人中心</a></li>
+    </ol>
+
+</nav>
+
+<div class="col-md-4" style="width: 265px;display: inline-block">
+    <div class="panel panel-default hot-recommend">
+        <div class="panel-heading">公告</div>
+        <div class="panel-body">
+            <ul class="list-unstyled">
+                <li>昵称：{{ obj.username }}</li>
+                <li>博龄：{{ obj.creat_time }}</li>    <!--utc时间，以后再说-->
+                <li>粉丝：{{ obj.fans }}</li>
+                <li>关注：{{ obj.follow }}</li>
+                <li>邮箱：{{ obj.email }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel panel-default hot-comment">
+        <div class="panel-heading">标签分类</div>
+        <div class="panel-body">
+            <ul class="list-unstyled">
+                <li><a>python</a></li>
+                <li><a>Linux</a></li>
+                <li><a>GoLang</a></li>
+                <li><a>Scrapy</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel panel-default hot-comment">
+        <div class="panel-heading">时间分类</div>
+        <div class="panel-body">
+            <ul class="list-unstyled">
+
+                <li><a>2017年11月（1）</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<div class="panel panel-default hot-recommend" style="position: absolute;left: 265px;top: 50px;width: 1029px;padding:0 50px;padding-bottom: 100px">
+    <div class="panel-body">
+        <div style="height: 40px;line-height: 40px">
+            <div class="c1">文章-{{ inform_num }}  评论-{{ a_obj.comm123 }}</div>
+        </div>
+        <h1 class="postTitle">
+            <a id="cb_post_title_url" class="postTitle2" href="{{ url123 }}">{{ title }}</a>
+        </h1>
+        <ul class="list-unstyled">
+            {{ files|safe }}
+        </ul>
+
+        <hr>
+        <h4><strong style="color: gold;text-decoration: none;">觉得文章写得好就给个赞吧！</strong></h4>
+        <div class="art-recommend clearfix">
+            <div class="recommend">
+                <a id="zan" class="up"
+                   style="margin: 5px 10px;display: inline-block;padding: 5px 15px;border: 1px solid #dddddd;text-align: center;">
+                    <i class="fa fa-thumbs-o-up fa-3" aria-hidden="true" style="font-size: 25px"></i>
+
+                    <div id="num_zan">{{ a_obj.fabulous }}</div>
+                </a>
+                <a id="cai" class="down"
+                   style="margin: 5px 30px 5px 10px;display: inline-block;padding: 5px 15px;border: 1px solid #dddddd;text-align: center;">
+                    <i class="fa fa-thumbs-o-down fa-3" aria-hidden="true" style="font-size: 25px"></i>
+
+                    <div id="num_cai">{{ a_obj.opposition }}</div>
+                </a>
+            </div>
+        </div>
+</div>
+<div class="art-tips clearfix">
+    <div class="tips">
+        <span class="ctime">发布时间：{{ a_obj.release_date }}</span>
+        <a class="author">{{ obj.username }}</a>
+        <span class="comment-count">评论({{ a_obj.comm123 }})</span>
+    </div>
+</div>
+<div id="AllanboltSignature">
+    <div style="border-bottom: #e0e0e0 1px dashed; border-left: #e0e0e0 1px dashed; padding: 10px; font-family: 微软雅黑; font-size: 11px; border-top: #e0e0e0 1px dashed; border-right: #e0e0e0 1px dashed; "
+         id="PSignature">
+        <div style="float:left;width:70px;">
+            <img src="/static/imgs/o_Warning.png" style="width:65px;height:65px">
+        </div>
+        <div style="float:left;padding-top:10px;">
+
+            <div style="padding: 1px">作者：<a href="#" target="_blank">{{ obj.username }}</a></div>
+            <div style="padding: 1px">出处：<a href="#" target="_blank">{{ url123 }}</a>
+            </div>
+            <div style="padding: 1px">本文版权归作者和博客园共有，欢迎转载，但未经作者同意必须保留此段声明，且在文章页面明显位置给出原文连接</div>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+</div>
+
+<div class="art-comment">
+<div style="height: 60px"></div>
+<div class="comment-title">
+    <strong>评论列表</strong>
+</div>
+
+<div class="comment-list" id="comment-list">
+<hr>
+{% for c in comm_obj %}
+<div style="border-bottom:  #e0e0e0 1px dashed;padding: 10px;">
+<div class="comment-item">
+    <div class="reply-title clearfix">
+        <div class="user-info">
+            <span>{{ c.reviewer.username }}</span>
+            <span>{{ c.ctime }}</span>
+        </div>
+        <div class="reply">
+            <a class="c3">回复</a>
+        </div>
+    </div>
+    <div class="reply-body">
+        <div class="content">
+            {{ c.comm_abstract|safe }}
+        </div>
+    </div>
+</div>
+</div>
+{% endfor %}
+</div>
+
+
+</div>
+
+
+    <div class="comment-list-pager">
+        <ul class="pagination">
+            {{ page_str }}
+        </ul>
+    </div>
+    <div class="comment-area">
+        <div class="replay-comment-user"></div>
+        <div class="reply-area" style="position: relative;">
+            <div class="modules">
+                您需要登录后才可以回帖 <a href="/login.html">登录</a> | <a href="/register.html">立即注册</a>
+            </div>
+            <textarea class="reviewww" name="content" style="width: 100%;height:200px;visibility:hidden;"></textarea>
+        </div>
+        <div class="reply-btn">
+            <span><span class="word_count2"></span>/255字</span>
+
+            <a id="recv">发表回复</a><span id="i1" style="margin: 0 20px;color: red"></span>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript" src="/static/js/jquery-1.12.4.js"></script>
+<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="/static/plugins/bootstrap/js/bootstrap.js"></script>
+<script charset="utf-8" src="/static/plugins/kindeditor/kindeditor-min.js"></script>
+<script charset="utf-8" src="/static/plugins/kindeditor/lang/zh_CN.js"></script>
+<script>
+
+    $.ajaxSetup({
+            beforeSend:function (xhr,settings) {
+                xhr.setRequestHeader('X-CSRFtoken',$.cookie('csrftoken'));
+            }
+        });
+    $('#zan').click(function () {
+        $.ajax({
+            url:'/fabulous/',
+            type:'POST',
+            data:{'author':'{{ obj.username }}'},
+            dataType:'JSON',
+            traditional: true,      // 传输列表[1,2,3,4]时要写上
+            success: function(obj){ // 回调函数，执行成功后自动触发这个函数
+            $("#num_zan").text(obj)
+        }
+        })
+    });
+    $('#cai').click(function () {
+        $.ajax({
+            url:'/opposition/',
+            type:'POST',
+            data:{'author':'{{ obj.username }}'},
+            dataType:'JSON',
+            traditional: true,      // 传输列表[1,2,3,4]时要写上
+            success: function(obj){ // 回调函数，执行成功后自动触发这个函数
+            $("#num_cai").text(obj)
+        }
+        })
+    });
+    var editor;
+        KindEditor.ready(function (K) {
+            editor = K.create('textarea[name="content"]', {
+                resizeType: 1,
+                allowPreviewEmoticons: false,
+                allowImageUpload: false,
+                items: [
+                    'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                    'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                    'insertunorderedlist', '|', 'emoticons', 'image', 'link'],
+                afterCreate : function() {
+                　　this.sync();
+                　　},
+            　　afterBlur:function(){
+                　　this.sync();
+                　　},
+                afterChange : function() {
+                   $('.word_count1').html(this.count()); //字数统计包含HTML代码
+                   $('.word_count2').html(this.count('text'));  //字数统计包含纯文本、IMG、EMBED，不包含换行符，IMG和EMBED算一个文字
+                   var limitNum = 255;  //设定限制字数
+                   var pattern = '还可以输入' + limitNum + '字';
+                   $('.word_surplus').html(pattern); //输入显示
+                   if(this.count('text') > limitNum) {
+                        pattern = ('字数超过限制，请适当删除部分内容');
+                        $('#i1').text(pattern);
+                        //超过字数限制自动截取
+                    var strValue = editor.text();
+                    strValue = strValue.substring(0,limitNum);
+                    editor.text(strValue);
+                    } else {
+                    //计算剩余字数
+                    var result = limitNum - this.count('text');
+                    pattern = '还可以输入' +  result + '字';
+                    }
+                    $('.word_surplus').html(pattern); //输入显示
+                   }
+            });
+        });
+    onload=function () {
+        $.ajax({
+            url:'/load/',
+            type:'POST',
+            data:{'name':'alex'},
+            success: function(data){
+                if(data){
+                    $('.modules').addClass('hide')
+                }
+            }
+        })
+    };
+
+    $("#recv").click(function () {
+        var content = $('.reviewww').val();
+
+        $.ajax({
+            url:'/comment/',
+            type:'POST',
+            data:{'article_id':'{{ a_obj.id }}','abstract':content},
+            success:function (obj) {
+                $("#i6").val('oimscklopl,;c');
+
+                var tags="<div style=\"border-bottom:  #e0e0e0 1px dashed;padding: 10px;\">\n" +
+                "<div class=\"comment-item\">\n" +
+                "    <div class=\"reply-title clearfix\">\n" +
+                "        <div class=\"user-info\">\n" +
+                "            <span>{{ request.session.username }}</span>\n" +
+                "            <span>"+obj+"</span>\n" +
+                "        </div>\n" +
+                "        <div class=\"reply\">\n" +
+                "            <a href=\"#\">回复</a>\n" +
+                "        </div>\n" +
+                "    </div>\n" +
+                "    <div class=\"reply-body\">\n" +
+                "        <div class=\"content\">\n" +
+                "            "+ content+" \n" +
+                "        </div>\n" +
+                "    </div>\n" +
+                "</div>\n" +
+                "</div>";
+                document.getElementById("comment-list").insertAdjacentHTML("beforeEnd",tags);
+
+                editor.html("")
+
+            }
+        })
+
+    });
+
+    $('.c3').click(function () {
+        var conn_name = $(this).parent().prev().children()[0].innerText;     //评论人的名字
+        editor.html('@'+conn_name);
+        $(window).scrollTop($('.comment-area').position().top)
+    })
+</script>
+
+</body>
+</html>

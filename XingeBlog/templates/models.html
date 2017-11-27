@@ -1,0 +1,122 @@
+{% load time_utc %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.css"/>
+    <link rel="stylesheet" href="/static/css/edmure.css"/>
+    <link rel="stylesheet" href="/static/css/commons.css"/>
+    <link rel="stylesheet" href="/static/css/row-avatar.css"/>
+    <link rel="stylesheet" href="/static/css/theme/default.css"/>
+
+    <link rel="stylesheet" href="/static/plugins/kindeditor/themes/default/default.css"/>
+
+    <style>
+        .modules{
+            text-align:center;
+            line-height:200px;
+            position: absolute;
+            top:0;left:0;right:0;bottom: 0;
+            background-color: rgba(255,255,255,.6)
+        }
+        .hide{
+            display:none
+        }
+        .c1{
+            float: right;
+        }
+        .postTitle{
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        a {
+            color: #399ab2;
+            text-decoration: none;
+        }
+        .c2{
+            width: 1349px;
+        }
+        .pagination .active {
+            background-color: gold;
+            color: white;
+        }
+    </style>
+    {% block css %}{% endblock %}
+
+</head>
+<body style="min-width: 600px;background-color: #dee7de">
+
+<nav class="navbar navbar-default c2" role="navigation" style="background-color:#96b97d;border-radius:0;position: relative">
+    <div class="container-fluid">
+    <div class="navbar-header">
+        <a class="navbar-brand" style="position: absolute;left: 120px;color: white" href="/{{ obj.username }}/all.html">{{ obj.username }}</a>
+    </div>
+    </div>
+    <ol class="breadcrumb left" style="border-radius:0;position: absolute;z-index: 11;right:0;top: 12px;background-color:#96b97d;">
+        <li><a href="/">博客园</a></li>
+        <li><a href="/{{ obj.username }}/all.html">首页</a></li>
+        <li><a href="/backend/add-article.html">新随笔</a></li>
+        <li><a href="/backend/base-info.html">个人中心</a></li>
+    </ol>
+
+</nav>
+
+<div class="col-md-4" style="width: 265px;display: inline-block">
+    <div class="panel panel-default hot-recommend">
+        <div class="panel-heading">公告</div>
+        <div class="panel-body">
+            <ul class="list-unstyled">
+                <li>昵称：{{ obj.username }}</li>
+                <li>博龄：{% change obj.creat_time %}</li>    <!--utc时间，以后再说-->
+                <li>粉丝：{{ obj.fans }}</li>
+                <li>关注：{{ obj.follow }}</li>
+                <li>邮箱：{{ obj.email }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel panel-default hot-comment">
+        <div class="panel-heading">标签分类</div>
+        <div class="panel-body">
+            <ul class="list-unstyled">
+                {% for i in group_obj %}
+                    <li><a href="/{{ obj.username }}/{{ i.category__classification_name }}.html">{{ i.category__classification_name }}({{ i.c }})</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="panel panel-default hot-comment">
+        <div class="panel-heading">时间分类</div>
+        <div class="panel-body">
+            <ul class="list-unstyled">
+                {% for i in temp %}
+                    <li><a href="/{{ obj.username }}/{% datechange i %}.html">{{ i }}（***一会再整***）</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<div class="panel panel-default hot-recommend c4" style="position: absolute;left: 265px;top: 50px;width: 1029px;padding:0 50px;padding-bottom: 100px">
+
+{% block body %}{% endblock %}
+
+</div>
+
+<script type="text/javascript" src="/static/js/jquery-1.12.4.js"></script>
+<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="/static/plugins/bootstrap/js/bootstrap.js"></script>
+<script charset="utf-8" src="/static/plugins/kindeditor/kindeditor-min.js"></script>
+<script charset="utf-8" src="/static/plugins/kindeditor/lang/zh_CN.js"></script>
+
+
+{% block js %}{% endblock %}
+
+</body>
+</html>

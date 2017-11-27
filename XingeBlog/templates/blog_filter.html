@@ -1,0 +1,71 @@
+{% extends 'models.html' %}
+{% load time_utc %}
+
+{% block css %}
+    <style>
+        div {
+            display: block;
+        }
+        body {
+            color: #333;
+            background: #dee7de;
+            font-family: verdana,Arial,Helvetica,sans-serif;
+            font-size: 10pt;
+        }
+        .postTitle {
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 20px 0 10px;
+        }
+        .postTitle {
+            margin-top: 10px;
+        }
+        div.postTitle {
+            border-bottom: 1px solid #eee;
+        }
+        div.postCon {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.5;
+        }
+        .c_b_p_desc {
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body %}
+<div style="height: 40px;line-height: 40px">
+    <div class="c1">文章-就先这么着吧  评论-{{ num }}</div>
+</div>
+{% for i in a_obj %}
+    <div class="day" style="padding: 30px 0;">
+        <div class="dayTitle">
+            <a id="homepage1_HomePageDays_DaysList_ctl00_ImageLink">{% change i.release_date %}</a>
+        </div>
+
+        <div class="postTitle">
+            <a id="homepage1_HomePageDays_DaysList_ctl00_DayList_TitleUrl_0" class="postTitle2" href='/{{ i.author.username }}-{{ i.id }}/'>{{ i.title }}</a>
+        </div>
+        <div class="postCon"><div class="c_b_p_desc">摘要: {{ i.abstract }}<a href='/{{ i.author.username }}-{{ i.id }}/' class="c_b_p_desc_readmore">阅读全文</a></div></div>
+        <div class="clear"></div>
+        <div class="postDesc">posted @ {% change i.release_date %} 想54256 阅读(****) 评论({{ i.comm123 }})</div>
+        <div class="clear"></div>
+    </div>
+{% endfor %}
+<div class="clearfix">
+    <ul class="pagination">
+        {{ page_str }}
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block js %}
+
+{% endblock %}

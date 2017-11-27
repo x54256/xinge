@@ -1,0 +1,94 @@
+{% extends 'backend_layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/plugins/kindeditor/themes/default/default.css"/>
+{% endblock %}
+
+{% block conent %}
+    <ol class="breadcrumb" style="margin-bottom: 0;">
+        <li><a href="/backend/article-all.html">文章管理</a></li>
+        <li class="active">创建文章</li>
+    </ol>
+    <div style="padding: 5px 8px;">
+        <form id="myForm" action="/backend/add-article.html" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="title">标题</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="文章标题">
+            </div>
+            <div class="form-group">
+                <label for="title">简介</label>
+                <textarea class="form-control" placeholder="文章简介" name="abstract" id="abstract"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="content">内容</label>
+                <textarea name="content" id="content" style="width: 100%;min-height:500px;visibility:hidden;"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="category">分类</label>
+
+                <div>
+                    {% for i in group_obj %}
+                        <label class="radio-inline">
+                            <input type="radio" name="category" class="category" value={{ i.classificate_id }}> {{ i.classificate.classification_name }}
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+{#                <button type="submit" class="btn btn-primary">保 存</button>#}
+                <input type="submit" class="btn btn-primary" value="保 存" onclick="return CancelPost();">
+
+            </div>
+        </form>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script charset="utf-8" src="/static/plugins/kindeditor/kindeditor-min.js"></script>
+    <script charset="utf-8" src="/static/plugins/kindeditor/lang/zh_CN.js"></script>
+    <script>
+        var editor;
+        KindEditor.ready(function (K) {
+            editor = K.create('textarea[name="content"]', {
+                resizeType: 1,      // 2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。
+                uploadJson: '/backend/upload/',      //上传到服务器端的路径 xxx.html
+                fileManagerJson: '/backend/file_manager/',   //文件空间管理
+                allowFileManager:true,      // true时显示浏览远程服务器按钮
+                extraFileUploadParams : {
+                    csrfmiddlewaretoken: "{{ csrf_token }}"     //csrf_token
+                },
+                filePostName: 'filename'    //发送的文件名字
+
+            });
+        });
+        function CancelPost() {
+            var title = $('#title').val();
+            var abstract = $('#abstract').val();
+            var content = editor.html();    //心疼我自己
+            var flag = 0;
+        var _radio = document.getElementById("myForm").getElementsByClassName("category");//获取单选框集合
+        for (var i = 0; i < _radio.length-1; i++)
+            if (_radio[i].checked == true) {
+                flag = 1;
+                break;
+            }
+        if (!flag) {
+            alert("请选择文章分类!");
+            return false;
+        }
+        if(title&&abstract&&content){
+                return true
+
+            }else{
+                alert('标题、摘要、内容不能为空');
+                return false;
+            }
+        }
+
+    </script>
+{% endblock %}

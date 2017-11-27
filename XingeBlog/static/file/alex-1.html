@@ -1,0 +1,625 @@
+<h1><span style="color: #3366ff;">Django之路_day4</span></h1>
+<h2><span style="color: #ff6600;">复习+总结</span></h2>
+<p><strong>请求周期</strong></p>
+<p>form表单提交</p>
+<p>-&gt; URL对应关系（匹配） -&gt; 视图函数 -&gt; 返回用户字符串（HTML文件）</p>
+<p>ajax表单提交</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">$('#i1').click(function(){      // 绑定一个事件
+    $.ajax({                    // $.ajax(里面是一个字典)
+        url: '/ajax_edit',      // 要发送到的url
+        type: "POST",           // 以post的方式发送
+        data: $('#add_form').serialize(),   // 打包form里所有的东西 发送，但要在提交的form表单上写id、class内写东西来绑定
+        // data: {'user': 123,'host_list': [1,2,3,4]},
+        dataType: 'JSON',       // 每次后端发送的都是字典转成的字符串，每次都要转码太麻烦，所以写上这个ajax内部就帮我们转码
+        traditional: true,      // 传输<span style="color: #ff6600;">列表</span>[1,2,3,4]到后台时要写上
+        success: function(obj){ // 回调函数，执行成功后自动触发这个函数
+            location.reload();  // jQuery下的 刷新页面   
+        },
+        error: function () {    // 发送请求，如果后台没抓到时执行
+ 
+        }
+ 
+    })
+});</pre>
+</div>
+<p><span style="color: #ff6600;">***new***</span>&nbsp; ajax不能直接做跳转</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">但我们可以间接的做啊
+
+function.reload()    #刷新页面
+
+function.href = '/...'    #做跳转　　</pre>
+</div>
+<p><strong>路由系统（url）</strong></p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">a. /index/                               -&gt;  函数或类
+b. /index/(\d+)                   	 -&gt;  函数或类
+c. /index/(?P&lt;nid&gt;\d+)  		 -&gt;  函数或类
+d. /index/(?P&lt;nid&gt;\d+) name='root' 	 -&gt;  函数或类
+	reverse()
+	{% url 'root' 1%}
+e. /crm/    include('app01.urls')        -&gt; 路由分发
+<br /><span style="color: #ff6600;">***new***</span><br />
+f. 默认值
+	url(r'^index/', views.index, {'name': 'root'}),
+
+	def index(request,name):	#向函数传递默认值
+		print(name)
+		return HttpResponse('OK')
+
+g. 命名空间    #听说从来都没用过
+
+	#最外层url
+	/crm1/    include('app01.urls',namespace='m1')
+	/crm2/      include('app01.urls',namespace='m')
+	
+	app01.urls
+	/index/    name = 'n1'
+	
+	reverser('m1:n1')	#自动生成域名views</pre>
+</div>
+<p><strong>views</strong></p>
+<p>之前学的request基本操作</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">def func(request):
+	request.POST	
+	request.GET
+	request.FILES
+	request.getlist
+	request.method
+	request.path_info	#获取当前url
+	
+	return render,HttpResponse,redirect		#返回的三种方式new</pre>
+</div>
+<p><span style="color: #ff6600;">***new***</span>&nbsp; request.environ</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">from django.core.handlers.wsgi import WSGIRequest	#要引入这个模块
+
+def index(request):
+    for k,v in request.environ.items():		# request.environ封装了所有的用户请求信息
+        print(k,v)
+    print(request.environ['HTTP_USER_AGENT'])
+	# HTTP_USER_AGENT ==&gt; 获取请求头（可以控制用什么**端登录）
+	
+    return HttpResponse('OK')muban</pre>
+</div>
+<p>装饰器</p>
+<p>　　-FBV</p>
+<div class="cnblogs_code">
+<pre><span style="color: #008080;"> 1</span> <span style="color: #0000ff;">def</span><span style="color: #000000;"> auth(func):
+</span><span style="color: #008080;"> 2</span>     <span style="color: #0000ff;">def</span> inner(reqeust,*args,**<span style="color: #000000;">kwargs):
+</span><span style="color: #008080;"> 3</span>         v = reqeust.COOKIES.get(<span style="color: #800000;">'</span><span style="color: #800000;">username111</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;"> 4</span>         <span style="color: #0000ff;">if</span> <span style="color: #0000ff;">not</span><span style="color: #000000;"> v:
+</span><span style="color: #008080;"> 5</span>             <span style="color: #0000ff;">return</span> redirect(<span style="color: #800000;">'</span><span style="color: #800000;">/login/</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;"> 6</span>         <span style="color: #0000ff;">return</span> func(reqeust, *args,**<span style="color: #000000;">kwargs)
+</span><span style="color: #008080;"> 7</span>     <span style="color: #0000ff;">return</span><span style="color: #000000;"> inner
+</span><span style="color: #008080;"> 8</span> 
+<span style="color: #008080;"> 9</span> <span style="color: #000000;">@auth
+</span><span style="color: #008080;">10</span> <span style="color: #0000ff;">def</span><span style="color: #000000;"> index(reqeust):
+</span><span style="color: #008080;">11</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> 获取当前已经登录的用户</span>
+<span style="color: #008080;">12</span>     v = reqeust.COOKIES.get(<span style="color: #800000;">'</span><span style="color: #800000;">username111</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;">13</span>     <span style="color: #0000ff;">return</span> render(reqeust,<span style="color: #800000;">'</span><span style="color: #800000;">index.html</span><span style="color: #800000;">'</span>,{<span style="color: #800000;">'</span><span style="color: #800000;">current_user</span><span style="color: #800000;">'</span>: v})</pre>
+</div>
+<p>　　-CBV</p>
+<div class="cnblogs_code">
+<pre><span style="color: #008080;"> 1</span> <span style="color: #0000ff;">from</span> django <span style="color: #0000ff;">import</span><span style="color: #000000;"> views
+</span><span style="color: #008080;"> 2</span> <span style="color: #0000ff;">from</span> django.utils.decorators <span style="color: #0000ff;">import</span><span style="color: #000000;"> method_decorator
+</span><span style="color: #008080;"> 3</span> 
+<span style="color: #008080;"> 4</span> @method_decorator(auth,name=<span style="color: #800000;">'</span><span style="color: #800000;">dispatch</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;"> 5</span> <span style="color: #0000ff;">class</span><span style="color: #000000;"> Order(views.View):
+</span><span style="color: #008080;"> 6</span> 
+<span style="color: #008080;"> 7</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> @method_decorator(auth)    #也可以在dispatch上写装饰器</span>
+<span style="color: #008080;"> 8</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> def dispatch(self, request, *args, **kwargs):</span>
+<span style="color: #008080;"> 9</span>     <span style="color: #008000;">#</span><span style="color: #008000;">     return super(Order,self).dispatch(request, *args, **kwargs)</span>
+<span style="color: #008080;">10</span> 
+<span style="color: #008080;">11</span>     <span style="color: #0000ff;">def</span><span style="color: #000000;"> get(self,reqeust):
+</span><span style="color: #008080;">12</span>         v = reqeust.COOKIES.get(<span style="color: #800000;">'</span><span style="color: #800000;">username111</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;">13</span>         <span style="color: #0000ff;">return</span> render(reqeust,<span style="color: #800000;">'</span><span style="color: #800000;">index.html</span><span style="color: #800000;">'</span>,{<span style="color: #800000;">'</span><span style="color: #800000;">current_user</span><span style="color: #800000;">'</span><span style="color: #000000;">: v})
+</span><span style="color: #008080;">14</span> 
+<span style="color: #008080;">15</span>     <span style="color: #0000ff;">def</span><span style="color: #000000;"> post(self,reqeust):
+</span><span style="color: #008080;">16</span>         v = reqeust.COOKIES.get(<span style="color: #800000;">'</span><span style="color: #800000;">username111</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;">17</span>         <span style="color: #0000ff;">return</span> render(reqeust,<span style="color: #800000;">'</span><span style="color: #800000;">index.html</span><span style="color: #800000;">'</span>,{<span style="color: #800000;">'</span><span style="color: #800000;">current_user</span><span style="color: #800000;">'</span><span style="color: #000000;">: v})
+</span><span style="color: #008080;">18</span> 
+<span style="color: #008080;">19</span> <span style="color: #0000ff;">def</span><span style="color: #000000;"> order(reqeust):
+</span><span style="color: #008080;">20</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> 获取当前已经登录的用户</span>
+<span style="color: #008080;">21</span>     v = reqeust.COOKIES.get(<span style="color: #800000;">'</span><span style="color: #800000;">username111</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;">22</span>     <span style="color: #0000ff;">return</span> render(reqeust,<span style="color: #800000;">'</span><span style="color: #800000;">index.html</span><span style="color: #800000;">'</span>,{<span style="color: #800000;">'</span><span style="color: #800000;">current_user</span><span style="color: #800000;">'</span>: v})</pre>
+</div>
+<p><strong>模板语言</strong></p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">for	--&gt;	   {{ for i in ...}} {{ endfor }}
+if	--&gt;    {{ if ...}} {{ endif }}
+索引--&gt;    .keys .values .items （字典中使用 都不加括号）.all  .filter （orm中多对多中使用）
+</pre>
+</div>
+<p>&nbsp;</p>
+<p><strong>ORM操作（增删改查不说了好吧）</strong></p>
+<p>只有在admin里才有验证功能，在数据库中存的都是字符串格式</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">class User(models.Model):
+	username = models.CharField(max_length=32)
+	email = models.EmailField()
+	
+	
+
+***EmailField等***
+
+在Django Admin中有验证功能
+	
+在添加数据库时无验证功能：
+	User.objects.create(username='root',email='asdfasdfasdfasdf')	#两种情况都会提示错误
+	User.objects.filter(id=1).update(email='666')	waijian　</pre>
+</div>
+<p>其他操作</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">class UserType(models.Model):
+	name = models.CharField(max_length=32)
+
+
+class User(models.Model):
+	username = models.CharField(max_length=32)
+	email = models.EmailField()
+	user_type = models.ForeignKey("UserType")
+
+user_list = User.objects.all()
+
+#对象方式
+for obj user_list:	
+	print(obj.username,obj.email,obj.user_type_id,obj.user_type.name,obj.user_type.id)
+
+user = User.objects.get(id=1)
+user.同上面对象方式的操作
+
+User.objects.all().values("username","user_type__name",)	
+#获取制定列的值  跨表操作要用'__'（元组和字典方式也用双下划线，详情请看上一节）waij</pre>
+</div>
+<p>外键（方式一，看上一节吧）</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">class UserType(models.Model):
+	name = models.CharField(max_length=32)
+
+
+class User(models.Model):
+	username = models.CharField(max_length=32)
+	email = models.EmailField()
+	user_type = models.ForeignKey("UserType")
+	m = models.ManyToManyField('UserGroup')
+	
+	
+obj = User.objects.get(id=1)
+obj.m.add(2)
+obj.m.add(2,3)
+obj.m.add(*[1,2,3])
+
+obj.m.remove(...)
+
+obj.m.clear()
+
+
+obj.m.set([1,2,3,4,5])
+
+# 多个组，UserGroup对象
+obj.m.all()
+obj.m.filter(name='CTO')    #在id=1下筛选name='CTO'的</pre>
+</div>
+<p><strong>end~</strong></p>
+<p><strong>templates</strong></p>
+<p><strong>1、母版</strong></p>
+<p>extends方法</p>
+<p><img src="http://images2017.cnblogs.com/blog/1251900/201711/1251900-20171109103822028-483289118.png" alt="" /></p>
+<div class="cnblogs_code" onclick="cnblogs_code_show('80ecfcc1-2090-4d86-9f45-6b4b62abec9e')"><img id="code_img_closed_80ecfcc1-2090-4d86-9f45-6b4b62abec9e" class="code_img_closed" src="http://images.cnblogs.com/OutliningIndicators/ContractedBlock.gif" alt="" /><img id="code_img_opened_80ecfcc1-2090-4d86-9f45-6b4b62abec9e" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide('80ecfcc1-2090-4d86-9f45-6b4b62abec9e',event)" src="http://images.cnblogs.com/OutliningIndicators/ExpandedBlockStart.gif" alt="" />
+<div id="cnblogs_code_open_80ecfcc1-2090-4d86-9f45-6b4b62abec9e" class="cnblogs_code_hide">
+<pre><span style="color: #008080;"> 1</span> <span style="color: #0000ff;">&lt;!</span><span style="color: #ff00ff;">DOCTYPE html</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 2</span> <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">html </span><span style="color: #ff0000;">lang</span><span style="color: #0000ff;">="en"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 3</span> <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 4</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">meta </span><span style="color: #ff0000;">charset</span><span style="color: #0000ff;">="UTF-8"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 5</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>{% block title %} {% endblock %}<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 6</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">link </span><span style="color: #ff0000;">rel</span><span style="color: #0000ff;">="stylesheet"</span><span style="color: #ff0000;"> href</span><span style="color: #0000ff;">="/static/commons.css"</span> <span style="color: #0000ff;">/&gt;</span>
+<span style="color: #008080;"> 7</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">style</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 8</span> <span style="background-color: #f5f5f5; color: #800000;">        .pg-header</span><span style="background-color: #f5f5f5; color: #000000;">{</span>
+<span style="color: #008080;"> 9</span> <span style="background-color: #f5f5f5; color: #ff0000;">            height</span><span style="background-color: #f5f5f5; color: #000000;">:</span><span style="background-color: #f5f5f5; color: #0000ff;"> 50px</span><span style="background-color: #f5f5f5; color: #000000;">;</span>
+<span style="color: #008080;">10</span> <span style="background-color: #f5f5f5; color: #ff0000;">            background-color</span><span style="background-color: #f5f5f5; color: #000000;">:</span><span style="background-color: #f5f5f5; color: #0000ff;"> seashell</span><span style="background-color: #f5f5f5; color: #000000;">;</span>
+<span style="color: #008080;">11</span> <span style="background-color: #f5f5f5; color: #ff0000;">            color</span><span style="background-color: #f5f5f5; color: #000000;">:</span><span style="background-color: #f5f5f5; color: #0000ff;"> green</span><span style="background-color: #f5f5f5; color: #000000;">;</span>
+<span style="color: #008080;">12</span>         <span style="background-color: #f5f5f5; color: #000000;">}</span>
+<span style="color: #008080;">13</span>     <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">style</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">14</span> <span style="color: #000000;">    {% block css %} {% endblock %}
+</span><span style="color: #008080;">15</span> <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">16</span> <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">17</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">div </span><span style="color: #ff0000;">class</span><span style="color: #0000ff;">="pg-header"</span><span style="color: #0000ff;">&gt;</span>小男孩管理<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">div</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">18</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">div</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">19</span>         <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>asdf<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">20</span>         <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">a </span><span style="color: #ff0000;">id</span><span style="color: #0000ff;">=""</span><span style="color: #0000ff;">&gt;</span>asdf<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">21</span>         <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>asdf<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">22</span>         <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>asdf<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">23</span>         <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>asdf<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">a</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">24</span>     <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">div</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">25</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">iframe </span><span style="color: #ff0000;">src</span><span style="color: #0000ff;">="/"</span><span style="color: #0000ff;">&gt;&lt;/</span><span style="color: #800000;">iframe</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">26</span> <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">27</span> <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">html</span><span style="color: #0000ff;">&gt;</span></pre>
+</div>
+<span class="cnblogs_code_collapse">View Code</span></div>
+<p>include方法</p>
+<p><img src="http://images2017.cnblogs.com/blog/1251900/201711/1251900-20171109103848481-1511046944.png" alt="" /></p>
+<p>引入母版文件</p>
+<p><img src="http://images2017.cnblogs.com/blog/1251900/201711/1251900-20171109104008403-1364191489.png" alt="" /></p>
+<div class="cnblogs_code" onclick="cnblogs_code_show('ee669f4b-3711-4bc9-8acb-f7959b893800')"><img id="code_img_closed_ee669f4b-3711-4bc9-8acb-f7959b893800" class="code_img_closed" src="http://images.cnblogs.com/OutliningIndicators/ContractedBlock.gif" alt="" /><img id="code_img_opened_ee669f4b-3711-4bc9-8acb-f7959b893800" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide('ee669f4b-3711-4bc9-8acb-f7959b893800',event)" src="http://images.cnblogs.com/OutliningIndicators/ExpandedBlockStart.gif" alt="" />
+<div id="cnblogs_code_open_ee669f4b-3711-4bc9-8acb-f7959b893800" class="cnblogs_code_hide">
+<pre><span style="color: #008080;"> 1</span> <span style="color: #000000;">{% extends 'master.html' %}
+</span><span style="color: #008080;"> 2</span> <span style="color: #000000;">{% block title %}用户管理{% endblock %}
+</span><span style="color: #008080;"> 3</span> <span style="color: #000000;">{% block content %}
+</span><span style="color: #008080;"> 4</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">h1</span><span style="color: #0000ff;">&gt;</span>用户管理<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">h1</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 5</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">ul</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 6</span> <span style="color: #000000;">        {% for i in u %}
+</span><span style="color: #008080;"> 7</span>             <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">li</span><span style="color: #0000ff;">&gt;</span>{{ i }}<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">li</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 8</span> <span style="color: #000000;">        {% endfor %}
+</span><span style="color: #008080;"> 9</span>     <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">ul</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">10</span> <span style="color: #000000;">    {% for i in u %}
+</span><span style="color: #008080;">11</span> <span style="color: #000000;">        {% include 'tag.html' %}
+</span><span style="color: #008080;">12</span> <span style="color: #000000;">    {% endfor %}
+</span><span style="color: #008080;">13</span> <span style="color: #000000;">{% endblock %}
+</span><span style="color: #008080;">14</span> 
+<span style="color: #008080;">15</span> <span style="color: #000000;">{% block css %}
+</span><span style="color: #008080;">16</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">style</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">17</span> <span style="background-color: #f5f5f5; color: #800000;">        body</span><span style="background-color: #f5f5f5; color: #000000;">{</span>
+<span style="color: #008080;">18</span> <span style="background-color: #f5f5f5; color: #ff0000;">            background-color</span><span style="background-color: #f5f5f5; color: #000000;">:</span><span style="background-color: #f5f5f5; color: #0000ff;"> red</span><span style="background-color: #f5f5f5; color: #000000;">;</span>
+<span style="color: #008080;">19</span>         <span style="background-color: #f5f5f5; color: #000000;">}</span>
+<span style="color: #008080;">20</span>     <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">style</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">21</span> <span style="color: #000000;">{% endblock %}
+</span><span style="color: #008080;">22</span> 
+<span style="color: #008080;">23</span> <span style="color: #000000;">{% block js %}
+</span><span style="color: #008080;">24</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">script</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">25</span>         <span style="background-color: #f5f5f5; color: #008000;">//</span><span style="background-color: #f5f5f5; color: #008000;">写js文件</span>
+<span style="color: #008080;">26</span>     <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">script</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">27</span> {% endblock %}</pre>
+</div>
+<span class="cnblogs_code_collapse">View Code</span></div>
+<p>小tips</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:html;gutter:true;">HTML中引入CSS
+
+&lt;link rel = 'stylesheet' herf = 'stactic/css文件/' /&gt;
+</pre>
+</div>
+<p><strong>2、自定义simple-tag</strong></p>
+<p>官方的</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:html;gutter:true;">{{ item.event_start|date:"Y-m-d H:i:s"}}    // 输入字符串转换成后面的时间格式
+{{ bio|truncatewords:"30" }}                      // 只取输入的30个字符
+{{ my_list|first|upper }}                              // 听说是第一个字符大写
+{{ name|lower }}                                        // 把字符串变成小写
+</pre>
+</div>
+<p>自定制函数步骤</p>
+<p>1、在app目录下创建templatetags目录</p>
+<p>2、创建任意(abc).py文件</p>
+<p>3、创建template对象register &nbsp; &nbsp;＃一定要这么写不能改名字</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">from django import template
+   
+register = template.Library()
+</pre>
+</div>
+<p>4、书写函数加入装饰器</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">a.
+@register.simple_tag
+def add(v1,v2,v3):
+    return  v1 + v2 + v3
+
+b.
+@register.filter
+def subtraction(a1,a2):
+    return a1 - a2</pre>
+</div>
+<p>5、在settings文件中注册app</p>
+<p>6、在html文件顶部引入该py文件</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">{% load abc %}    //引入py文件 只能用{%  %}
+
+调用函数的方法
+
+a.  {% add 1 2 3 %}　　//调用函数加传参数
+
+b.  {{ 5|subtraction:2 }}　　//函数名后面不能加空格
+
+小tips
+
+{% load abc %}    //先引入load
+{% extends " xx.html " %}   </pre>
+</div>
+<p>两种方法的优缺点</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">simple_tag
+	缺点：
+		不能作为if条件
+	优点：
+		参数任意
+
+filter
+	缺点：
+		最多两个参数，不能加空格		
+	优点：
+		能作为if条件	{% if {{ 5|subtraction:2 }} %}
+</pre>
+</div>
+<p><strong>分页</strong></p>
+<p>我们可以通过从后端发送标签（&lt;a herf="..."&gt;123&lt;/a&gt;）到前端的方法实现页面的某些功能</p>
+<p>但django默认会认为所有在页面显示的都是不安全的（为了防止XSS攻击），so有以下操作</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:html;gutter:true;">//假设传来的参数是page_list
+
+方法一（前端）
+
+{{ page_list|safe }}    //加上|safe 就变成安全的
+
+方法二（后端）
+
+from django.utils.safestring import mark_safe
+
+def page_list(id,arg):    #内容瞎写的，别信
+
+    result = "&lt;input type='text' id='%s' class='%s' /&gt;" %(id,arg,)
+
+    return render(....,{'page_list',mark_safe(result)})    #make_safe(里面的东西就变成安全的)fenye</pre>
+</div>
+<p>我们可以（在根目录建立一个文件夹utils）写一个类，里面封装着分页的操作（里面有一个bug，跳转框输入数字 不管存不存在都会跳转到那个页面）</p>
+<div class="cnblogs_code" onclick="cnblogs_code_show('98756075-01ef-4b1e-9bab-d569c3f9a590')"><img id="code_img_closed_98756075-01ef-4b1e-9bab-d569c3f9a590" class="code_img_closed" src="http://images.cnblogs.com/OutliningIndicators/ContractedBlock.gif" alt="" /><img id="code_img_opened_98756075-01ef-4b1e-9bab-d569c3f9a590" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide('98756075-01ef-4b1e-9bab-d569c3f9a590',event)" src="http://images.cnblogs.com/OutliningIndicators/ExpandedBlockStart.gif" alt="" />
+<div id="cnblogs_code_open_98756075-01ef-4b1e-9bab-d569c3f9a590" class="cnblogs_code_hide">
+<pre><span style="color: #008080;"> 1</span> <span style="color: #0000ff;">from</span> django.utils.safestring <span style="color: #0000ff;">import</span><span style="color: #000000;"> mark_safe
+</span><span style="color: #008080;"> 2</span> 
+<span style="color: #008080;"> 3</span> 
+<span style="color: #008080;"> 4</span> <span style="color: #0000ff;">class</span><span style="color: #000000;"> Page:
+</span><span style="color: #008080;"> 5</span>     <span style="color: #0000ff;">def</span> <span style="color: #800080;">__init__</span>(self, current_page, data_count, per_page_count=10, pager_num=7<span style="color: #000000;">):
+</span><span style="color: #008080;"> 6</span>         self.current_page =<span style="color: #000000;"> current_page
+</span><span style="color: #008080;"> 7</span>         self.data_count =<span style="color: #000000;"> data_count
+</span><span style="color: #008080;"> 8</span>         self.per_page_count =<span style="color: #000000;"> per_page_count
+</span><span style="color: #008080;"> 9</span>         self.pager_num =<span style="color: #000000;"> pager_num
+</span><span style="color: #008080;">10</span> 
+<span style="color: #008080;">11</span>     @property   <span style="color: #008000;">#</span><span style="color: #008000;">可以直接调用不用加()，好看一些</span>
+<span style="color: #008080;">12</span>     <span style="color: #0000ff;">def</span><span style="color: #000000;"> start(self):
+</span><span style="color: #008080;">13</span>         <span style="color: #0000ff;">return</span> (self.current_page - 1) *<span style="color: #000000;"> self.per_page_count
+</span><span style="color: #008080;">14</span> 
+<span style="color: #008080;">15</span> <span style="color: #000000;">    @property   
+</span><span style="color: #008080;">16</span>     <span style="color: #0000ff;">def</span><span style="color: #000000;"> end(self):
+</span><span style="color: #008080;">17</span>         <span style="color: #0000ff;">return</span> self.current_page *<span style="color: #000000;"> self.per_page_count
+</span><span style="color: #008080;">18</span> 
+<span style="color: #008080;">19</span> <span style="color: #000000;">    @property
+</span><span style="color: #008080;">20</span>     <span style="color: #0000ff;">def</span><span style="color: #000000;"> total_count(self):
+</span><span style="color: #008080;">21</span>         v, y =<span style="color: #000000;"> divmod(self.data_count, self.per_page_count)
+</span><span style="color: #008080;">22</span>         <span style="color: #0000ff;">if</span><span style="color: #000000;"> y:
+</span><span style="color: #008080;">23</span>             v += 1
+<span style="color: #008080;">24</span>         <span style="color: #0000ff;">return</span><span style="color: #000000;"> v
+</span><span style="color: #008080;">25</span> 
+<span style="color: #008080;">26</span>     <span style="color: #0000ff;">def</span><span style="color: #000000;"> page_str(self, base_url):
+</span><span style="color: #008080;">27</span>         page_list =<span style="color: #000000;"> []
+</span><span style="color: #008080;">28</span> 
+<span style="color: #008080;">29</span>         <span style="color: #0000ff;">if</span> self.total_count &lt;<span style="color: #000000;"> self.pager_num:
+</span><span style="color: #008080;">30</span>             start_index = 1
+<span style="color: #008080;">31</span>             end_index = self.total_count + 1
+<span style="color: #008080;">32</span>         <span style="color: #0000ff;">else</span><span style="color: #000000;">:
+</span><span style="color: #008080;">33</span>             <span style="color: #0000ff;">if</span> self.current_page &lt;= (self.pager_num + 1) / 2<span style="color: #000000;">:
+</span><span style="color: #008080;">34</span>                 start_index = 1
+<span style="color: #008080;">35</span>                 end_index = self.pager_num + 1
+<span style="color: #008080;">36</span>             <span style="color: #0000ff;">else</span><span style="color: #000000;">:
+</span><span style="color: #008080;">37</span>                 start_index = self.current_page - (self.pager_num - 1) / 2
+<span style="color: #008080;">38</span>                 end_index = self.current_page + (self.pager_num + 1) / 2
+<span style="color: #008080;">39</span>                 <span style="color: #0000ff;">if</span> (self.current_page + (self.pager_num - 1) / 2) &gt;<span style="color: #000000;"> self.total_count:
+</span><span style="color: #008080;">40</span>                     end_index = self.total_count + 1
+<span style="color: #008080;">41</span>                     start_index = self.total_count - self.pager_num + 1
+<span style="color: #008080;">42</span> 
+<span style="color: #008080;">43</span>         <span style="color: #0000ff;">if</span> self.current_page == 1<span style="color: #000000;">:
+</span><span style="color: #008080;">44</span>             prev = <span style="color: #800000;">'</span><span style="color: #800000;">&lt;a class="page" href="javascript:void(0);"&gt;上一页&lt;/a&gt;</span><span style="color: #800000;">'</span>
+<span style="color: #008080;">45</span>         <span style="color: #0000ff;">else</span><span style="color: #000000;">:
+</span><span style="color: #008080;">46</span>             prev = <span style="color: #800000;">'</span><span style="color: #800000;">&lt;a class="page" href="%s?p=%s"&gt;上一页&lt;/a&gt;</span><span style="color: #800000;">'</span> % (base_url, self.current_page - 1<span style="color: #000000;">,)
+</span><span style="color: #008080;">47</span> <span style="color: #000000;">        page_list.append(prev)
+</span><span style="color: #008080;">48</span> 
+<span style="color: #008080;">49</span>         <span style="color: #0000ff;">for</span> i <span style="color: #0000ff;">in</span><span style="color: #000000;"> range(int(start_index), int(end_index)):
+</span><span style="color: #008080;">50</span>             <span style="color: #0000ff;">if</span> i ==<span style="color: #000000;"> self.current_page:
+</span><span style="color: #008080;">51</span>                 temp = <span style="color: #800000;">'</span><span style="color: #800000;">&lt;a class="page active" href="%s?p=%s"&gt;%s&lt;/a&gt;</span><span style="color: #800000;">'</span> %<span style="color: #000000;"> (base_url, i, i)
+</span><span style="color: #008080;">52</span>             <span style="color: #0000ff;">else</span><span style="color: #000000;">:
+</span><span style="color: #008080;">53</span>                 temp = <span style="color: #800000;">'</span><span style="color: #800000;">&lt;a class="page" href="%s?p=%s"&gt;%s&lt;/a&gt;</span><span style="color: #800000;">'</span> %<span style="color: #000000;"> (base_url, i, i)
+</span><span style="color: #008080;">54</span> <span style="color: #000000;">            page_list.append(temp)
+</span><span style="color: #008080;">55</span> 
+<span style="color: #008080;">56</span>         <span style="color: #0000ff;">if</span> self.current_page ==<span style="color: #000000;"> self.total_count:
+</span><span style="color: #008080;">57</span>             nex = <span style="color: #800000;">'</span><span style="color: #800000;">&lt;a class="page" href="javascript:void(0);"&gt;下一页&lt;/a&gt;</span><span style="color: #800000;">'</span>
+<span style="color: #008080;">58</span>         <span style="color: #0000ff;">else</span><span style="color: #000000;">:
+</span><span style="color: #008080;">59</span>             nex = <span style="color: #800000;">'</span><span style="color: #800000;">&lt;a class="page" href="%s?p=%s"&gt;下一页&lt;/a&gt;</span><span style="color: #800000;">'</span> % (base_url, self.current_page + 1<span style="color: #000000;">,)
+</span><span style="color: #008080;">60</span> <span style="color: #000000;">        page_list.append(nex)
+</span><span style="color: #008080;">61</span> 
+<span style="color: #008080;">62</span>         jump = <span style="color: #800000;">"""</span>
+<span style="color: #008080;">63</span> <span style="color: #800000;">        &lt;input type='text'  /&gt;&lt;a onclick='jumpTo(this, "%s?p=");'&gt;GO&lt;/a&gt;
+</span><span style="color: #008080;">64</span> <span style="color: #800000;">        &lt;script&gt;
+</span><span style="color: #008080;">65</span> <span style="color: #800000;">            function jumpTo(ths,base){
+</span><span style="color: #008080;">66</span> <span style="color: #800000;">                var val = ths.previousSibling.value;
+</span><span style="color: #008080;">67</span> <span style="color: #800000;">                location.href = base + val;
+</span><span style="color: #008080;">68</span> <span style="color: #800000;">            }
+</span><span style="color: #008080;">69</span> <span style="color: #800000;">        &lt;/script&gt;
+</span><span style="color: #008080;">70</span>         <span style="color: #800000;">"""</span> %<span style="color: #000000;"> (base_url,)
+</span><span style="color: #008080;">71</span> 
+<span style="color: #008080;">72</span> <span style="color: #000000;">        page_list.append(jump)
+</span><span style="color: #008080;">73</span> 
+<span style="color: #008080;">74</span>         page_str = mark_safe(<span style="color: #800000;">""</span><span style="color: #000000;">.join(page_list))
+</span><span style="color: #008080;">75</span> 
+<span style="color: #008080;">76</span>         <span style="color: #0000ff;">return</span> page_str</pre>
+</div>
+<span class="cnblogs_code_collapse">分页的类，以后要用</span></div>
+<p>直接调用类里面的方法</p>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">from</span>  utils <span style="color: #0000ff;">import</span><span style="color: #000000;"> pagination
+LIST </span>=<span style="color: #000000;"> []
+</span><span style="color: #0000ff;">for</span> i <span style="color: #0000ff;">in</span> range(500<span style="color: #000000;">):
+    LIST.append(i)
+
+</span><span style="color: #0000ff;">def</span><span style="color: #000000;"> user_list(request):
+    current_page </span>= request.GET.get(<span style="color: #800000;">'</span><span style="color: #800000;">p</span><span style="color: #800000;">'</span>, 1)  <span style="color: #008000;">#</span><span style="color: #008000;">1是干嘛的 ==&gt; 第一次请求的时候默认看第一页</span>
+    current_page =<span style="color: #000000;"> int(current_page)
+
+    page_obj </span>=<span style="color: #000000;"> pagination.Page(current_page,len(LIST))
+
+    data </span>=<span style="color: #000000;"> LIST[page_obj.start:page_obj.end]
+
+    page_str </span>= page_obj.page_str(<span style="color: #800000;">"</span><span style="color: #800000;">/user_list/</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+
+    </span><span style="color: #0000ff;">return</span> render(request, <span style="color: #800000;">'</span><span style="color: #800000;">user_list.html</span><span style="color: #800000;">'</span>, {<span style="color: #800000;">'</span><span style="color: #800000;">data</span><span style="color: #800000;">'</span>: data,<span style="color: #800000;">'</span><span style="color: #800000;">page_str</span><span style="color: #800000;">'</span>: page_str})</pre>
+</div>
+<div class="cnblogs_code" onclick="cnblogs_code_show('9273b73a-542f-49e4-ae75-27d9f0dc5b47')"><img id="code_img_closed_9273b73a-542f-49e4-ae75-27d9f0dc5b47" class="code_img_closed" src="http://images.cnblogs.com/OutliningIndicators/ContractedBlock.gif" alt="" /><img id="code_img_opened_9273b73a-542f-49e4-ae75-27d9f0dc5b47" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide('9273b73a-542f-49e4-ae75-27d9f0dc5b47',event)" src="http://images.cnblogs.com/OutliningIndicators/ExpandedBlockStart.gif" alt="" />
+<div id="cnblogs_code_open_9273b73a-542f-49e4-ae75-27d9f0dc5b47" class="cnblogs_code_hide">
+<pre><span style="color: #008080;"> 1</span> <span style="color: #0000ff;">&lt;!</span><span style="color: #ff00ff;">DOCTYPE html</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 2</span> <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">html </span><span style="color: #ff0000;">lang</span><span style="color: #0000ff;">="en"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 3</span> <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 4</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">meta </span><span style="color: #ff0000;">charset</span><span style="color: #0000ff;">="UTF-8"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 5</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>Title<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 6</span> <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 7</span> <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 8</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">ul</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 9</span> <span style="color: #000000;">        {% for i in data %}
+</span><span style="color: #008080;">10</span>             <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">li</span><span style="color: #0000ff;">&gt;</span>{{ i }}<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">li</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">11</span> <span style="color: #000000;">        {% endfor %}
+</span><span style="color: #008080;">12</span>     <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">ul</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">13</span> 
+<span style="color: #008080;">14</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">div</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">15</span> <span style="color: #000000;">        {{ page_str }}
+</span><span style="color: #008080;">16</span>     <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">div</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">17</span> <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">18</span> <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">html</span><span style="color: #0000ff;">&gt;</span></pre>
+</div>
+<span class="cnblogs_code_collapse">HTML</span></div>
+<p>小Tips</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">a.
+for i in range(1,5):
+	print(i)
+	
+&gt;&gt;1,2,3,4
+
+b.
+herf = "javascript：void(0)" &lt;==&gt; herf = '#'	//啥也不干
+</pre>
+</div>
+<div class="cnblogs_Highlighter">
+<pre class="brush:html;gutter:true;">c.
+/index/?p=1
+
+获取方法：
+　　page = request.GET.get('p')
+</pre>
+</div>
+<p><strong>cookie</strong></p>
+<p>获取cookie</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">request.COOKIES['key']
+request.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
+    参数：
+        default: 默认值
+           salt: 加密盐
+        max_age: 后台控制过期时间</pre>
+</div>
+<p>设置cookie</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">rep = HttpResponse(...) 或 rep ＝ render(request, ...) 或 redirect('/index/')
+ 
+rep.set_cookie(key,value,...)
+rep.set_signed_cookie(key,value,salt='加密盐',...)
+    参数：
+        key,              键
+        value='',         值
+        max_age=None,     超时时间　　#max_age=10 以s作单位
+        expires=None,     超时时间(IE requires expires, so set it if hasn't been already.)
+        path='/',         Cookie生效的路径，/ 表示根路径，特殊的：根路径的cookie可以被任何url的页面访问
+        domain=None,      Cookie生效的域名
+        secure=False,     https传输
+        httponly=False    只能http协议传输，无法被JavaScript获取（不是绝对，底层抓包可以获取到也可以被覆盖）
+</pre>
+</div>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">import datetime
+
+current_date = datetime.datetime.utcnow()
+
+current_date = current_date+datetime.timedelta(seconds=5)   #5s</pre>
+</div>
+<p>&nbsp;小tips</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:python;gutter:true;">import hashlib
+
+m = hashlib.md5('sdcxzmvdvk')	#这里面加的就是盐
+
+m.update('abc123')</pre>
+</div>
+<p>前端也可以设置，获取cookie</p>
+<div class="cnblogs_Highlighter">
+<pre class="brush:html;gutter:true;">&lt;script src='/static/jquery'&gt;&lt;/script&gt;
+&lt;script src='/static/js/jquery.cookie.js'&gt;&lt;/script&gt;
+
+//设置
+$.cookie("key", 'value',{ path: '/' ,...});
+
+//获取
+$.cookie('key')</pre>
+</div>
+<pre>示例：<br />views.py</pre>
+<div class="cnblogs_code">
+<pre><span style="color: #008080;"> 1</span> <span style="color: #0000ff;">def</span><span style="color: #000000;"> cookie(request):
+</span><span style="color: #008080;"> 2</span>     <span style="color: #008000;">#
+</span><span style="color: #008080;"> 3</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> request.COOKIES</span>
+<span style="color: #008080;"> 4</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> request.COOKIES['username111']</span>
+<span style="color: #008080;"> 5</span>     request.COOKIES.get(<span style="color: #800000;">'</span><span style="color: #800000;">username111</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;"> 6</span> 
+<span style="color: #008080;"> 7</span>     response = render(request,<span style="color: #800000;">'</span><span style="color: #800000;">index.html</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;"> 8</span>     response = redirect(<span style="color: #800000;">'</span><span style="color: #800000;">/index/</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;"> 9</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> 设置cookie，关闭浏览器时失效</span>
+<span style="color: #008080;">10</span>     response.set_cookie(<span style="color: #800000;">'</span><span style="color: #800000;">key</span><span style="color: #800000;">'</span>,<span style="color: #800000;">"</span><span style="color: #800000;">value</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+</span><span style="color: #008080;">11</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> 设置cookie, N秒后失效</span>
+<span style="color: #008080;">12</span>     response.set_cookie(<span style="color: #800000;">'</span><span style="color: #800000;">username111</span><span style="color: #800000;">'</span>,<span style="color: #800000;">"</span><span style="color: #800000;">value</span><span style="color: #800000;">"</span>,max_age=10<span style="color: #000000;">)
+</span><span style="color: #008080;">13</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> 设置cookie, 截止时间失效</span>
+<span style="color: #008080;">14</span>     <span style="color: #0000ff;">import</span><span style="color: #000000;"> datetime
+</span><span style="color: #008080;">15</span>     current_date =<span style="color: #000000;"> datetime.datetime.utcnow()
+</span><span style="color: #008080;">16</span>     current_date = current_date + datetime.timedelta(seconds=5<span style="color: #000000;">)
+</span><span style="color: #008080;">17</span>     response.set_cookie(<span style="color: #800000;">'</span><span style="color: #800000;">username111</span><span style="color: #800000;">'</span>,<span style="color: #800000;">"</span><span style="color: #800000;">value</span><span style="color: #800000;">"</span>,expires=<span style="color: #000000;">current_date)
+</span><span style="color: #008080;">18</span>     response.set_cookie(<span style="color: #800000;">'</span><span style="color: #800000;">username111</span><span style="color: #800000;">'</span>,<span style="color: #800000;">"</span><span style="color: #800000;">value</span><span style="color: #800000;">"</span>,max_age=10<span style="color: #000000;">)
+</span><span style="color: #008080;">19</span> 
+<span style="color: #008080;">20</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> request.COOKIES.get('...')</span>
+<span style="color: #008080;">21</span>     <span style="color: #008000;">#</span><span style="color: #008000;"> response.set_cookie(...)</span>
+<span style="color: #008080;">22</span>     obj = HttpResponse(<span style="color: #800000;">'</span><span style="color: #800000;">s</span><span style="color: #800000;">'</span><span style="color: #000000;">)
+</span><span style="color: #008080;">23</span> 
+<span style="color: #008080;">24</span>     obj.set_signed_cookie(<span style="color: #800000;">'</span><span style="color: #800000;">username</span><span style="color: #800000;">'</span>,<span style="color: #800000;">"</span><span style="color: #800000;">kangbazi</span><span style="color: #800000;">"</span>,salt=<span style="color: #800000;">"</span><span style="color: #800000;">asdfasdf</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+</span><span style="color: #008080;">25</span>     request.get_signed_cookie(<span style="color: #800000;">'</span><span style="color: #800000;">username</span><span style="color: #800000;">'</span>,salt=<span style="color: #800000;">"</span><span style="color: #800000;">asdfasdf</span><span style="color: #800000;">"</span><span style="color: #000000;">)
+</span><span style="color: #008080;">26</span> 
+<span style="color: #008080;">27</span>     <span style="color: #0000ff;">return</span> response</pre>
+</div>
+<p>&nbsp;</p>
+<p>login.html</p>
+<div class="cnblogs_code">
+<pre><span style="color: #008080;"> 1</span> <span style="color: #0000ff;">&lt;!</span><span style="color: #ff00ff;">DOCTYPE html</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 2</span> <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">html </span><span style="color: #ff0000;">lang</span><span style="color: #0000ff;">="en"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 3</span> <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 4</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">meta </span><span style="color: #ff0000;">charset</span><span style="color: #0000ff;">="UTF-8"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 5</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;&lt;/</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 6</span> <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 7</span> <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 8</span>     <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">form </span><span style="color: #ff0000;">action</span><span style="color: #0000ff;">="/login/"</span><span style="color: #ff0000;"> method</span><span style="color: #0000ff;">="POST"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;"> 9</span>         <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">input </span><span style="color: #ff0000;">type</span><span style="color: #0000ff;">="text"</span><span style="color: #ff0000;"> name</span><span style="color: #0000ff;">="username"</span><span style="color: #ff0000;"> placeholder</span><span style="color: #0000ff;">="用户名"</span> <span style="color: #0000ff;">/&gt;</span>
+<span style="color: #008080;">10</span>         <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">input </span><span style="color: #ff0000;">type</span><span style="color: #0000ff;">="password"</span><span style="color: #ff0000;"> name</span><span style="color: #0000ff;">="pwd"</span><span style="color: #ff0000;"> placeholder</span><span style="color: #0000ff;">="密码"</span> <span style="color: #0000ff;">/&gt;</span>
+<span style="color: #008080;">11</span>         <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">input </span><span style="color: #ff0000;">type</span><span style="color: #0000ff;">="submit"</span> <span style="color: #0000ff;">/&gt;</span>
+<span style="color: #008080;">12</span>     <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">form</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">13</span> <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #008080;">14</span> <span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">html</span><span style="color: #0000ff;">&gt;</span></pre>
+</div>
+<p>index.html</p>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">&lt;!</span><span style="color: #ff00ff;">DOCTYPE html</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">html </span><span style="color: #ff0000;">lang</span><span style="color: #0000ff;">="en"</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+    <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">meta </span><span style="color: #ff0000;">charset</span><span style="color: #0000ff;">="UTF-8"</span><span style="color: #0000ff;">&gt;</span>
+    <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;&lt;/</span><span style="color: #800000;">title</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">head</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+    <span style="color: #0000ff;">&lt;</span><span style="color: #800000;">h1</span><span style="color: #0000ff;">&gt;</span>欢迎登录：{{ current_user }}<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">h1</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>
+<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">html</span><span style="color: #0000ff;">&gt;</span></pre>
+</div>
+<p>&nbsp;</p>
+<p><img src="http://images2017.cnblogs.com/blog/1251900/201711/1251900-20171111164954247-691308213.png" alt="" /></p>
+<p>　</p>
+<p>&nbsp;</p>

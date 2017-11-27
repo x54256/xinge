@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.css"/>
+    <link rel="stylesheet" href="/static/css/commons.css"/>
+    <link rel="stylesheet" href="/static/css/backend.css"/>
+    <link rel="stylesheet" href="/static/css/row-avatar.css"/>
+    <style>
+        .pagination .active{
+                background-color: gold;
+                color: white;
+            }
+    </style>
+    {% block css %} {% endblock %}
+</head>
+<body>
+<div class="pg-header">
+    <div class="logo left" style="text-align: center;background-color: #1c5a9c;">
+        <a href="" style="color: #ffffff;font-size:30px;font-weight: bold;text-decoration: none">
+            鑫哥棒棒哒！
+        </a>
+    </div>
+
+    <div class="left-menu left">
+        <a class="menu-item" href="/">博客首页</a>
+    </div>
+
+    <div class="right-menu right clearfix">
+
+        <div class="user-info right">
+            <a class="avatar">
+                <img style="height:40px;width: 40px;" class="img-circle" src='{{ user_obj.user_img }}'>
+            </a>
+
+            <div class="more-info">
+                <a href="/backend/base-info.html" class="more-item">个人信息</a>
+                <a href="/exit/" class="more-item">注销</a>
+            </div>
+        </div>
+
+        <a class="user-menu right">
+            消息
+            <i class="fa fa-commenting-o" aria-hidden="true"></i>
+            <span class="badge bg-success">{{ user_obj.news }}</span>
+        </a>
+
+        <a class="user-menu right">
+            通知
+            <i class="fa fa-envelope-o" aria-hidden="true"></i>
+            <span class="badge bg-success">{{ user_obj.notic }}</span>
+        </a>
+
+        <a class="user-menu right">
+            任务
+            <i class="fa fa-bell-o" aria-hidden="true"></i>
+            <span class="badge bg-danger">{{ user_obj.task }}</span>
+        </a>
+    </div>
+
+</div>
+<div class="pg-body">
+    <div class="menu">
+        <a class="menu-item" href="/backend/article-all.html">
+            <i class="fa fa-cogs" aria-hidden="true"></i>
+            <span>文章管理</span>
+        </a>
+        <a class="menu-item" href="/backend/category.html">
+            <i class="fa fa-cogs" aria-hidden="true"></i>
+            <span>分类管理</span>
+        </a>
+        <a class="menu-item" href="/backend/base-info.html">
+            <i class="fa fa-cogs" aria-hidden="true"></i>
+            <span>个人信息</span>
+        </a>
+    </div>
+    <div class="content">
+        {% block conent %} {% endblock %}
+    </div>
+</div>
+<script src="/static/js/jquery-1.12.4.js"></script>
+<script src="/static/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="/static/plugins/bootstrap/js/bootstrap.js"></script>
+<script>
+    $.ajaxSetup({
+            beforeSend:function (xhr,settings) {
+                xhr.setRequestHeader('X-CSRFtoken',$.cookie('csrftoken'));
+            }
+        });
+</script>
+{% block js %}{% endblock %}
+</body>
+</html>
