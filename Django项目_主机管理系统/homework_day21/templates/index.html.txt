@@ -1,0 +1,154 @@
+{% extends 'master.html' %}
+
+{% block css %}
+    <style>
+        .c1{
+            float: right;
+        }
+        .c2{
+            padding: 0 30px;
+        }
+        .panel-group{max-height:770px;overflow: auto;}
+        .leftMenu{margin:10px;margin-top:5px;}
+        .leftMenu .panel-heading{font-size:14px;padding-left:20px;height:36px;line-height:36px;color:white;position:relative;cursor:pointer;}/*转成手形图标*/
+        .leftMenu .panel-heading span{position:absolute;right:0;top:0;}
+        .leftMenu .menu-item-left{padding: 0; background: transparent; border:1px solid transparent;border-radius: 6px;}
+        .leftMenu .menu-item-left:hover{background:#C4E3F3;border:1px solid #1E90FF;}
+        .c3{
+            position: absolute;
+            top: 50px;
+            left: 0;
+            bottom: 0;
+            width: 255px;
+            margin: 0 auto;
+        }
+    </style>
+
+{% endblock %}
+
+{% block body %}
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#">主机管理系统</a>
+    </div>
+    <div>
+        <ul class="nav navbar-nav c1">
+            <li class="c2"><a href="#">欢迎登录{{ current_user }}</a></li>
+            <li><a class="c2" href="/exit/">退出</a></li>
+        </ul>
+    </div>
+    </div>
+</nav>
+
+<div class="row">
+    <div class="col-md-2">
+        <div class="panel-group table-responsive" role="tablist">
+            <div class="panel panel-primary leftMenu">
+                <!-- 利用data-target指定要折叠的分组列表 -->
+                {% for i in group_obj %}
+                <div class="panel-heading" id="collapseListGroupHeading1" data-toggle="collapse" data-target="#collapseListGroup1" role="tab" >
+
+                        <h4 class="panel-title" gid="{{ i.gid }}">
+                            {{ i.group_name }}
+                        </h4>
+
+                </div>
+                {% endfor %}
+                <!-- .panel-collapse和.collapse标明折叠元素 .in表示要显示出来 -->
+            </div><!--panel end-->
+       </div>
+    </div>
+
+    <div class="col-md-10">
+        <caption style="display: inline-block"><h1>主机列表</h1></caption><a target="_blank" href="/add/">添加</a>
+
+        <table class="table table-bordered">
+
+
+
+          <thead>
+            <tr>
+              <th>主机名</th>
+              <th>IP</th>
+              <th>端口号</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for i in group_host_list %}
+            <tr>
+              <td style="display: none">{{ i.hid }}</td>
+              <td style="display: none">{{ i.hostgroup_id }}</td>
+              <td>{{ i.host_name }}</td>
+              <td>{{ i.ip }}</td>
+              <td>{{ i.port }}</td>
+              <td><a>修改</a> | <a  data-toggle="modal" data-target="#myModal" class="del">删除</a></td>
+            </tr>
+          {% endfor %}
+          {% for i in host_obj %}
+            <tr>
+              <td style="display: none">{{ i.hid }}</td>
+              <td style="display: none">{{ i.hostgroup_id }}</td>
+              <td>{{ i.host_name }}</td>
+              <td>{{ i.ip }}</td>
+              <td>{{ i.port }}</td>
+              <td><a target="_blank" href="/edit/">修改</a> |
+              <!-- 按钮触发模态框 -->
+                <a  data-toggle="modal" data-target="#myModal" class="del">删除</a>
+                <!-- 模态框（Modal） -->
+
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            </div>
+                            <div class="modal-body">是否确认删除</div>
+                            <div class="modal-footer">
+                                <form id="del_form">
+                                    <input style="display: none" type="text" name="gid" class="gid"/>
+                                    <input style="display: none" type="text" name="hid" class="hid" />
+                                </form>
+                                <button type="button" class="btn btn-primary">确认</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
+                </div>
+              </td>
+            </tr>
+
+          {% endfor %}
+
+          </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block script %}
+    <script>
+        $('.del').click(function () {
+            var gid = $(this).parent().siblings()[1].innerText;
+            $('.gid').val(gid);
+             var hid = $(this).parent().siblings()[0].innerText;
+            $('.hid').val(hid);
+        });
+
+        $(".btn-primary").click(function () {
+            $.ajax({
+                url:'/index/',
+                type:'POST',
+                data:$('#del_form').serialize(),
+                dataType:'JSON',
+                success:function (data) {
+                    location.reload()
+                }
+            })
+        })
+    </script>
+{% endblock %}

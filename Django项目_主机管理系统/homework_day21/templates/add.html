@@ -1,0 +1,36 @@
+{% extends 'master2.html' %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="col-md-10">
+        <caption style="display: inline-block"><h1>添加用户</h1></caption><span>{{ blest }}</span>
+        <form method="post" action="/add/">
+
+            <p><input type="text" name="user" placeholder="请输入用户名" /></p>
+            <p><input type="text" name="pwd" placeholder="请输入密码" /></p>
+            <p>请选择主机：</p>
+            <p>
+                <select name="host_list" multiple>
+                    {% for i in host_list %}
+                        <option value={{ i.hid }}>主机名:{{ i.host_name }}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p>请选择主机组：</p>
+            <p>
+                <select name="group_list" multiple>
+                    {% for i in group_list %}
+                        <option value="{{ i.gid }}">主机组名:{{ i.group_name }}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p><input type="submit" /></p>
+        </form>
+    </div>
+
+
+{% endblock %}

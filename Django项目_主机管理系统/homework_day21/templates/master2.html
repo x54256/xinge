@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7-dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7-dist/css/bootstrap-theme.css" />
+{#    <link rel="stylesheet" href="/static/Font-Awesome-master/css/font-awesome.css" />#}
+    <style>
+        .c1{
+            float: right;
+        }
+        .c2{
+            padding: 0 30px;
+        }
+        .panel-group{max-height:770px;overflow: auto;}
+        .leftMenu{margin:10px;margin-top:5px;}
+        .leftMenu .panel-heading{font-size:14px;padding-left:20px;height:36px;line-height:36px;color:white;position:relative;cursor:pointer;}/*转成手形图标*/
+        .leftMenu .panel-heading span{position:absolute;right:0;top:0;}
+        .leftMenu .menu-item-left{padding: 0; background: transparent; border:1px solid transparent;border-radius: 6px;}
+        .leftMenu .menu-item-left:hover{background:#C4E3F3;border:1px solid #1E90FF;}
+        .c3{
+            position: absolute;
+            top: 50px;
+            left: 0;
+            bottom: 0;
+            width: 255px;
+            margin: 0 auto;
+        }
+    </style>
+    {% block css %}{% endblock %}
+
+</head>
+<body style="min-width: 800px">
+
+    <nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#">主机管理系统</a>
+    </div>
+    <div>
+        <ul class="nav navbar-nav c1">
+            <li class="c2"><a href="#">欢迎登录{{ current_user }}</a></li>
+            <li><a class="c2" href="/exit/">退出</a></li>
+        </ul>
+    </div>
+    </div>
+</nav>
+
+<div class="row">
+    <div class="col-md-2">
+        <div class="panel-group table-responsive" role="tablist">
+            <div class="panel panel-primary leftMenu">
+                <!-- 利用data-target指定要折叠的分组列表 -->
+                {% for i in group_obj %}
+                <div class="panel-heading" id="collapseListGroupHeading1" data-toggle="collapse" data-target="#collapseListGroup1" role="tab" >
+
+                        <h4 class="panel-title" gid="{{ i.gid }}">
+                            {{ i.group_name }}
+                        </h4>
+
+                </div>
+                {% endfor %}
+                <!-- .panel-collapse和.collapse标明折叠元素 .in表示要显示出来 -->
+            </div><!--panel end-->
+       </div>
+    </div>
+
+    {% block body %}{% endblock %}
+</div>
+
+    <script src="/static/jquery-1.12.4.js"></script>
+    <script src="/static/jquery.cookie.js"></script>
+    <script src="/static/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+
+    {% block script %}{% endblock %}
+</body>
+</html>

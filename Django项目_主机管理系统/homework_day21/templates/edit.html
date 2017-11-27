@@ -1,0 +1,18 @@
+{% extends 'master2.html' %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="col-md-10">
+        <caption style="display: inline-block"><h1>修改主机信息</h1></caption>
+        <form method="post" action="/edit/">
+            {{ host_info }}
+
+        </form>
+    </div>
+
+
+{% endblock %}
