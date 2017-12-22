@@ -1,0 +1,107 @@
+{% extends 'base_home.html' %}
+
+{% block body %}
+
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>	
+				<span></span>			
+				<ul class="subnav">
+					<li><a href="/1-1-1.html" class="fruit">新鲜水果</a></li>
+					<li><a href="/1-2-1.html" class="seafood">海鲜水产</a></li>
+					<li><a href="/1-3-1.html" class="meet">猪牛羊肉</a></li>
+					<li><a href="/1-4-1.html" class="egg">禽类蛋品</a></li>
+					<li><a href="/1-5-1.html" class="vegetables">新鲜蔬菜</a></li>
+					<li><a href="/1-6-1.html" class="ice">速冻食品</a></li>
+				</ul>
+			</div>
+			<ul class="navlist fl">
+				<li><a href="/">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="#">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="#">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="breadcrumb">
+		<a href="/">全部分类</a>
+		<span>></span>
+		<a href="/1-1-1.html">{{ type_name }}</a>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+                    {% for new in new_list %}
+					<li>
+						<a href="#"><img src='/static/{{ new.fpic }}'></a>
+						<h4><a href="#">{{ new.ftitle }}</a></h4>
+						<div class="prize">￥{{ new.fprice }}</div>
+					</li>
+                    {% endfor %}
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<div class="sort_bar">
+                {% if kwargs.nid == '1' %}
+				    <a href="/1-{{ kwargs.tid }}-{{ kwargs.pid }}.html" class="active">默认</a>
+                {% else %}
+                    <a href="/1-{{ kwargs.tid }}-{{ kwargs.pid }}.html">默认</a>
+                {% endif %}
+                {% if kwargs.nid == '2' %}
+                    <a href="/2-{{ kwargs.tid }}-{{ kwargs.pid }}.html" class="active">价格</a>
+                {% else %}
+                    <a href="/2-{{ kwargs.tid }}-{{ kwargs.pid }}.html">价格</a>
+                {% endif %}
+				{% if kwargs.nid == '3' %}
+                    <a href="/3-{{ kwargs.tid }}-{{ kwargs.pid }}.html" class="active">人气</a>
+                {% else %}
+                    <a href="/3-{{ kwargs.tid }}-{{ kwargs.pid }}.html">人气</a>
+                {% endif %}
+
+			</div>
+
+			<ul class="goods_type_list clearfix">
+                {% for i in data %}
+				<li>
+					<a href="/{{ i.ftype.tentitle }}/{{ i.id }}"><img src="/static/{{ i.fpic }}"></a>
+					<h4><a href="/{{ i.ftype.tentitle }}/{{ i.id }}">{{ i.ftitle }}</a></h4>
+                    <div style="display: none">{{ i.id }}</div>
+					<div class="operate">
+						<span class="prize">￥{{ i.fprice }}</span>
+						<span class="unit">{{ i.fprice }}/{{ i.funit }}</span>
+						<a href="javascript:;" class="add_goods" title="加入购物车"></a>
+					</div>
+				</li>
+                {% endfor %}
+			</ul>
+
+			<div class="pagenation">
+				{{ page_str }}  {# 后端传来的页码 #}
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block script %}
+    <script>
+        $(".add_goods").click(function () {
+            var nid = $(this).parent().prev().text();
+            $.ajax({
+                url:'/shop/add/',
+                type:'POST',
+                data:{'nid':nid,'num':1},
+                success:function (dat) {
+                    $("#show_count").text(1+parseInt($(".goods_count").text()))
+                    alert('添加成功！');
+                }
+            })
+        })
+    </script>
+{% endblock %}
