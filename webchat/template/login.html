@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>web聊天室-登录</title>
+	<link href="/static/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="/static/css/htmleaf-demo.css">
+	<link href="/static/css/signin.css" rel="stylesheet">
+	<link href="/static/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+	<div class="htmleaf-container">
+		<header class="htmleaf-header">
+			<h1>web聊天室-登录</h1>
+
+		</header>
+		<div class="signin">
+			<div class="signin-head"><img src="/static/images/test/head_120.png" alt="" class="img-circle"></div>
+			<form class="form-signin" role="form">
+				{% module xsrf_form_html() %}
+				<input type="text" class="form-control" placeholder="用户名" id="username" required autofocus />
+				<input type="password" class="form-control" placeholder="密码" id="password" required />
+				<div class="error-msg" id="password-err"><i class="fa fa-exclamation-circle hide" style="color: red"></i><span style="color: red"></span></div>
+				<button class="btn btn-lg btn-warning btn-block" type="button">登录</button>
+				<label class="checkbox">
+					<input type="checkbox" id="remember-me"> 记住我
+				</label>
+			</form>
+			<div style="float: right;padding: 20px">没有账号 <a>立即注册</a></div>
+		</div>
+	</div>
+	<script src="/static/js/jquery.min.js"></script>
+	<script>
+		function getCookie(name) {
+			var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+			return r ? r[1] : undefined;
+		}
+
+		$(".btn-warning").click(function () {
+		    var data = {"username":$("#username").val(),'password':$("#password").val(),'rmb':$("#remember-me").is(':checked')};
+		    var jsondata = JSON.stringify(data);
+			$.ajax({
+				url:"/login.html",
+				type:"POST",
+				data: jsondata,
+				contentType: "application/json",
+				dataType: "json",
+				headers:{
+					"X-XSRFTOKEN":getCookie("_xsrf")
+				},
+				success:function (dat) {
+					if(dat.errno == '0'){
+					    location.href = '/'
+					}else{
+					    $("#password-err span").html(dat.errmsg);
+						$(".fa-exclamation-circle").removeClass('hide')
+					}
+                }
+			})
+        })
+
+	</script>
+</body>
+</html>

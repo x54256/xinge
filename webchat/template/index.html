@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+	<title>webchat-主页</title>
+	<link media="all" href="/static/css/style.css?v=2222" type="text/css" rel="stylesheet">
+	<link media="all" href="/static/css/shake.css?v=2222" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div id="layout-container">
+	<div id="layout-main">
+		<div id="header">
+			<div style="float: right;margin: 17px 15px 4px 0px;">
+				<!--<div title="退出" class="iconfont" onclick="chat.logout()" style="height: 26px;width: 26px;color: #EDF7FF;font-size: 26px;line-height: 26px;cursor: pointer;"></div>-->
+			</div>
+			<div class="search-bar-wraper" style="width: 268px;">鑫哥棒棒哒的聊天室！！！</div>
+		</div>
+		<div id="body">
+			<div id="menu-pannel-body">
+				<div id="sub-menu-pannel" class="conv-list-pannel">
+					<div class="conv-lists-box" id="user-lists">
+						<div class="conv-lists" id="conv-lists">
+
+
+<input type="text" style="display: none" id="user_id" value="{{data['nid']}}">
+<div id="{{ data['nid'] }}" uname="我" class="list-item conv-item context-menu conv-item-company"><i class="iconfont icon-delete-conv tipper-attached"></i><div class="avatar-wrap"><div class="group-avatar"><div class="normal group-logo-avatar" style="background-image: url(http://chat.hellosee.cc/static/images/avatar/f1/f_6.jpg);"></div></div></div><div class="conv-item-content"><div class="title-wrap info"><div class="name-wrap"><p class="name">我</p></div><span class="time">{{ datatime }}</span></div></div></div>
+
+
+{% for u in users_data %}
+	<div id="{{ u['nid'] }}" onclick="chat.remind(this)" uname="{{ u['username'] }}" class="list-item conv-item context-menu conv-item-company"><i class="iconfont icon-delete-conv tipper-attached"></i><div class="avatar-wrap"><div class="group-avatar"><div class="normal group-logo-avatar" style="background-image: url(http://chat.hellosee.cc/static/images/avatar/f1/f_6.jpg);"></div></div></div><div class="conv-item-content"><div class="title-wrap info"><div class="name-wrap"><p class="name">{{ u['username'] }}</p></div><span class="time">{{u["datatime"]}}</span></div></div></div>
+{% end %}
+
+
+
+						</div>
+					</div>
+				</div>
+				<div id="content-pannel">
+					<div class="conv-detail-pannel">
+						<!--<div class="nocontent-logo" style="display:none;" >-->
+							<!--<div>-->
+								<!--<img alt="欢迎" src="/static/images/noimg.png">-->
+							<!--</div>-->
+						<!--</div>-->
+						<div class="content-pannel-body chat-box-new" id="chat-box">
+							<div class="main-chat chat-items" id="chat-lists">
+								<div class="msg-items" id="chatLineHolder">
+
+<!--<div class="chat-status chat-system-notice">系统消息：欢迎&nbsp;yiran&nbsp;加入群聊</div>-->
+
+<!--<div style="display: block;" class="msg-box"><div class="chat-item me"><div class="clearfix"><div class="avatar"><div class="normal user-avatar" style="background-image: url(http://chat.hellosee.cc/static/images/avatar/f1/f_2.jpg);"></div></div><div class="msg-bubble-box"><div class="msg-bubble-area"><div><div class="msg-bubble"><pre class="text"><font color="blue">@123　</font></pre></div></div></div></div></div></div></div>-->
+
+
+
+
+
+								</div>
+							</div>
+						</div>
+						<div>
+							<div class="send-msg-box-wrapper">
+								<div class="input-area">
+									<ul class="tool-bar">
+										<li class="tool-item">
+											<i class="iconfont tool-icon tipper-attached emotion_btn" title="表情"></i>
+											<div class="faceDiv"></div>
+										</li>
+										<li class="tool-item">
+											<i class="iconfont tool-icon icon-card tipper-attached" onclick="upload()" title="图片"></i>
+										</li>
+									</ul>
+									<span class="user-guide">Enter 发送 , Ctrl+Enter 换行</span>
+									<div class="msg-box" style="height:100%;">
+										<textarea class="textarea input-msg-box" onkeydown="chat.keySend(event);" id="chattext"></textarea>
+									</div>
+								</div>
+								<div class="action-area">
+									<a href="javascript:;" class="send-message-button" onclick="sendMsg()">发送</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="carrousel"> <span class="close entypo-cancel"></span> 
+  <div class="wrapper"> <img src="/static/images/noimg.png" /> </div>
+</div>
+<script src="/static/js/jquery.min.js"></script>
+<script>
+	var ws = new WebSocket("ws://127.0.0.1:8000/chat");
+		ws.onmessage = function(e) {
+		    var dict = JSON.parse(e.data);
+		    if(dict.userdata.nid == $("#user_id").val()){
+		        if(dict.nocode == '0') {
+                    $("#chatLineHolder").append('<div style="display: block;" class="msg-box"><div class="chat-item me"><div class="clearfix"><div class="avatar"><div class="normal user-avatar" style="background-image: url(/static/images/avatar/f1/f_2.jpg);"></div></div><div class="msg-bubble-box"><div class="msg-bubble-area"><div><div class="msg-bubble"><pre class="text"><font color="white">' + dict.msg + '　</font></pre></div></div></div></div></div></div></div>');
+                }else if(dict.nocode == '1'){
+					$("#chatLineHolder").append('<div class="chat-status chat-system-notice">系统消息：欢迎&nbsp;'+dict.userdata.username+'&nbsp;加入群聊</div>')
+		    	}else if(dict.nocode == '2'){
+					$("#chatLineHolder").append('<div class="chat-status chat-system-notice">系统消息：&nbsp;'+dict.userdata.username+'&nbsp;退出群聊</div>')
+					$("#"+dict.userdata.nid).remove();
+		        }
+			}else{
+		        if(dict.nocode == '0') {
+                    $("#chatLineHolder").append('<div style="display: block;" class="msg-box"><div class="chat-item not-me"><div class="chat-profile-info clearfix"><span class="profile-wrp"><span class="name clearfix"><span class="name-text">'+dict.userdata.username+'</span></span></span><span class="chat-time">'+dict.userdata.datatime+'</span></div><div class="clearfix"><div class="avatar"><div class="normal user-avatar" fd="4154" uname="5123d" style="background-image: url(/static/images/avatar/f1/f_2.jpg);"></div></div><div class="msg-bubble-box"><div class="msg-bubble-area"><div class="msg-bubble"><pre class="text">'+dict.msg+'</pre></div></div></div></div></div></div>');
+                }else if(dict.nocode == '1'){
+					$("#chatLineHolder").append('<div class="chat-status chat-system-notice">系统消息：欢迎&nbsp;'+dict.userdata.username+'&nbsp;加入群聊</div>')
+					$("#conv-lists").append('<div id='+dict.userdata.nid+' onclick="chat.remind(this)" uname='+dict.userdata.username+' class="list-item conv-item context-menu conv-item-company"><i class="iconfont icon-delete-conv tipper-attached"></i><div class="avatar-wrap"><div class="group-avatar"><div class="normal group-logo-avatar" style="background-image: url(/static/images/avatar/f1/f_6.jpg);"></div></div></div><div class="conv-item-content"><div class="title-wrap info"><div class="name-wrap"><p class="name">'+dict.userdata.username+'</p></div><span class="time">'+dict.userdata.datatime+'</span></div></div></div>')
+		    	}else if(dict.nocode == '2'){
+					$("#chatLineHolder").append('<div class="chat-status chat-system-notice">系统消息：&nbsp;'+dict.userdata.username+'&nbsp;退出群聊</div>')
+					$("#"+dict.userdata.nid).remove();
+		        }
+			}
+		    $('#chat-lists').scrollTop( $('#chat-lists')[0].scrollHeight );
+		};
+		function sendMsg() {
+			var msg = $(".textarea").val();
+            ws.send(msg);
+            $(".textarea").val("");
+		}
+</script>
+</body>
+</html>

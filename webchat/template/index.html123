@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>webchat-聊天室</title>
+
+	<!-- 新 Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/static/css/main.css">
+	<link rel="stylesheet" href="/static/css/12edccc6099f46713d664410cd78082e.css">
+</head>
+<body>
+<div class="row">
+			<div class="col-md-6 col-md-offset-3 col-sm-12 historyMsg" id="historyMsg">
+
+
+
+			</div>
+		</div>
+	
+	<div class="container chat-container">
+		<!-- 标题header -->
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3 col-sm-12 banner">
+				<h1>XingeChat v1.0</h1>
+				<span id="status">0</span>
+				<span>人在线</span>
+			</div>
+		</div>
+
+		<!-- 历史消息 -->
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3 col-sm-12 historyMsg" id="historyMsg">
+
+
+
+			</div>
+		</div>
+
+		<!-- 控制台 -->
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3 col-sm-12 control" style="height: 205px;">
+				<div class="row control-row">
+					<div class="col-md-8 col-sm-8" style="width: 100%">
+						<textarea name="content" id="inputMsg" class="inputMsg form-control"></textarea>
+					</div>
+					<div class="col-md-4 col-sm-4" style="float: right">
+						<button id="sendBtn" class="form-control sendBtn btn btn-primary" onclick="sendMsg();">发  送</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--<footer>-->
+		<!--<small>Designed and built by <a href="http://kyrieliu.cn" target="_blank">kyrieliu</a></small>-->
+	<!--</footer>-->
+
+	<script src="/static/js/jquery-1.12.4.js"></script>
+    <script type="text/javascript">
+
+		var ws = new WebSocket("ws://127.0.0.1:8000/chat");
+		ws.onmessage = function(e) {
+			// $("#historyMsg").append('<div class="bubble_cont ng-scope plain"><div class="plain"><img ng-show="message.MMStatus == 1" class="ng-hide" style="width: 40px;height: 40px" src="/static/images/test/head_120.png">'+getNowFormatDate()+'\n x5456</div></div>');
+			$("#historyMsg").append('<div class="bubble_cont ng-scope plain"><div class="plain" style="display: inline-block"><pre class="js_message_plain ng-binding" style="width: 500px" ng-bind-html="message.MMActualContent">'+e.data+'</pre></div><img ng-show="message.MMStatus == 1" class="ng-hide" style="width: 40px;height: 40px;display: inline-block" src="/static/images/test/head_120.png"></div>');
+			$("#historyMsg").append('<div class="bubble_cont ng-scope plain"><img ng-show="message.MMStatus == 1" class="ng-hide" style="width: 40px;height: 40px;display: inline-block" src="/static/images/test/abc.png"><div class="plain" style="display: inline-block"><pre class="js_message_plain ng-binding" style="width: 500px" ng-bind-html="message.MMActualContent">'+e.data+'</pre></div></div>');
+			$('#historyMsg').scrollTop( $('#historyMsg')[0].scrollHeight );
+		};
+		function sendMsg() {
+			var msg = editor.html();
+			ws.send(msg);
+			editor.html("");
+		}
+
+
+    </script>
+
+
+	<!-- 获取xsrf -->
+	<script>
+		function getCookie(name) {
+			var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+			return r ? r[1] : undefined;
+		}
+		//获取当前时间
+		function getNowFormatDate() {
+			var date = new Date();
+			var seperator1 = "-";
+			var seperator2 = ":";
+			var month = date.getMonth() + 1;
+			var strDate = date.getDate();
+			if (month >= 1 && month <= 9) {
+				month = "0" + month;
+			}
+			if (strDate >= 0 && strDate <= 9) {
+				strDate = "0" + strDate;
+			}
+			var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+					+ " " + date.getHours() + seperator2 + date.getMinutes()
+					+ seperator2 + date.getSeconds();
+			return currentdate;
+		}
+	</script>
+
+
+	 <!--kind-editor的配置-->
+	<script src="/static/plugins/kindeditor/kindeditor-all-min.js"></script>
+	<script src="/static/plugins/kindeditor/lang/zh_CN.js"></script>
+	<script>
+		var editor;
+        KindEditor.ready(function (K) {
+            editor = K.create('textarea[name="content"]', {
+                resizeType: 0,      // 2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。
+                uploadJson: '/backend/upload/',      //上传到服务器端的路径 xxx.html
+                extraFileUploadParams : {
+                    csrfmiddlewaretoken: getCookie("_xsrf")
+                },
+				items: ["emoticons","image","baidumap"],
+                filePostName: 'filename',    //发送的文件名字
+				width: '100%',       // 文本框宽度(可以百分比或像素)
+				height: '100px',     // 文本框高度(只能像素)
+            });
+        });
+
+	</script>
+</body>
+</html>

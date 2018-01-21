@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>web聊天室-注册</title>
+	<link href="/static/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="/static/css/htmleaf-demo.css">
+	<link href="/static/css/signin.css" rel="stylesheet">
+	<link href="/static/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        .signin2 {
+            width:477px;
+            height:540px;
+            background:url(/static/images/login_bg_new.png) no-repeat;
+            margin:0 auto;
+
+            position:absolute;
+            top:50%;
+            left:50%;
+            margin-top:-239px;
+            margin-left:-238px;
+        }
+        .signin3 {
+            width:430px;
+            height:300px;
+            margin:0 auto;
+
+            position:absolute;
+            top:77%;
+            left:52%;
+            margin-top:-239px;
+            margin-left:-225px;
+        }
+        .c10086{
+            font-size: small;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+	<div class="htmleaf-container">
+		<header class="htmleaf-header">
+			<h1>web聊天室-注册</h1>
+
+		</header>
+		<div class="signin2">
+        <div class="signin-head"><img src="/static/images/test/head_120.png" alt="" class="img-circle"></div>
+            <div class="signin3">
+			<form class="form-register" action="/register.html" method="post">
+            {% module xsrf_form_html() %}
+                <input type="text" style="display: none" id="code_id" name="code_id">
+            <div class="form-group form-group-lg">
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-mobile fa-2x fa-fw"></i></div>
+                    {%raw form.username%}
+                    <!--<input type="text" class="form-control" name="username" id="username" placeholder="用户名" required>-->
+                </div>
+            </div>
+
+            <div class="error-msg c10086" id="mobile-err"><span>{{form.error_dict.get('username',"")}}</span></div>
+            <div class="form-group form-group-lg">
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-image fa-lg fa-fw"></i></div>
+                    {%raw form.imagecode%}
+                    <!--<input type="text" class="form-control" name="imagecode" id="imagecode" placeholder="图片验证码" required>-->
+                    <div class="input-group-addon image-code" onclick="generateImageCode();"><img src=""></div>
+                </div>
+            </div>
+            <div class="error-msg c10086" id="image-code-err"><span>{{form.error_dict.get('imagecode',"")}}</span></div>
+            <div class="form-group form-group-lg">
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-lock fa-lg fa-fw"></i></div>
+                    {% raw form.password %}
+                    <!--<input type="password" class="form-control" name="password" id="password" placeholder="密码" required>-->
+                </div>
+            </div>
+            <div class="error-msg c10086" id="password-err"><span>{{form.error_dict.get('password',"")}}</span></div>
+            <div class="form-group form-group-lg">
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-lock fa-lg fa-fw"></i></div>
+                    {% raw form.password2 %}
+                    <!--<input type="password" class="form-control" name="password2" id="password2" placeholder="确认密码" required>-->
+                </div>
+            </div>
+            <div class="error-msg c10086" id="password2-err"><span>{{form.error_dict.get('password2',"")}}</span></div>
+            <button type="submit" class="btn btn-lg btn-theme btn-block">立即注册</button>
+            </form>
+                <div style="float: right;padding: 20px">已有账号，<a>立即登陆</a></div>
+            </div>
+		</div>
+	</div>
+    <script src="/static/js/jquery-1.12.4.js"></script>
+    <script>
+        function generateUUID() {
+            var d = new Date().getTime();
+            if(window.performance && typeof window.performance.now === "function"){
+                d += performance.now(); //use high-precision timer if available
+            }
+            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = (d + Math.random()*16)%16 | 0;
+                d = Math.floor(d/16);
+                return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+            });
+            return uuid;
+        }
+
+        var imageCodeId = "";
+
+        function generateImageCode() {
+            picId = generateUUID();
+            $("#code_id").val(picId);
+            $(".image-code img").attr("src", "/imagecode?pcodeid="+imageCodeId+"&codeid="+picId);
+            imageCodeId = picId;
+        }
+
+        $(function () {
+            generateImageCode();
+        })
+
+    </script>
+
+</body>
+</html>

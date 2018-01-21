@@ -68,7 +68,7 @@ def check_code(request):
     :param request:
     :return:
     """
-    stream = BytesIO()
+    stream = BytesIO()	# 内存读写io
     img, code = create_check_code()
     print(code)
     img.save(stream,'PNG')
