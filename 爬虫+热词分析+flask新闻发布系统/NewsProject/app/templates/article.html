@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/static/js/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/article.css">
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-static-top" style="width: 100%">
+    <div class="container">
+        <div class="navbar-header">
+
+            <!-- 3条杠的小图标，data-target的值要和下面的div的id一样 -->
+            <button class="navbar-toggle" data-toggle="collapse" data-target="#menu">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+             </button>
+
+            <!--logo-->
+            <a href="#" class="navbar-brand"><img class="img" src="https://s3.pstatp.com/toutiao/static/img/logo.201f80d.png" alt="logo"/></a>
+        </div>
+
+        <!-- 用这个div把类别包起来，小部件才好使 -->
+        <div class="collapse navbar-collapse" id="menu">
+        <!-- 导航栏上的类别 -->
+            <ul class="nav navbar-nav">
+                <li><a href="/toutiao/all">全部</a></li>
+                <li><a href="/toutiao/news_hots">热点</a></li>
+                <li><a href="/toutiao/news_tech">科技</a></li>
+                <li><a href="/toutiao/news_entertainment">娱乐</a></li>
+                <li><a href="/toutiao/news_sports">体育</a></li>
+                <li><a href="/toutiao/news_car">汽车</a></li>
+                <li><a href="/toutiao/news_finance">财经</a></li>
+                <li><a href="/toutiao/news_world">国际</a></li>
+                <li><a href="/toutiao/news_baby">育儿</a></li>
+                <li><a href="/toutiao/news_military">军事</a></li>
+            </ul>
+
+            <!-- 搜索框 -->
+            <form class="navbar-form navbar-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" name="" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="position: relative;min-width: 800px;">
+    <div class="col-md-4" style="width: 300px;position: absolute;left: 0;top: 0 ;">
+            <div class="panel panel-default hot-recommend">
+                <div class="panel-heading">一周热词</div>
+                <div class="panel-body">
+                    <ul class="list-unstyled">
+                        {% for i in top_10 %}
+                            <a href="/toutiao/search?keyword={{ i[1] }}"><li>{{ loop.index }}、{{ i[1] }}</li></a>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="panel panel-default hot-comment">
+                <div class="panel-heading">热门搜索排行</div>
+                <div class="panel-body">
+                    <ul class="list-unstyled">
+                        <li>Lorem ipsum dolor sit amet</li>
+                        <li>Consectetur adipiscing elit</li>
+                        <li>Integer molestie lorem at massa</li>
+                        <li>Facilisis in pretium nisl aliquet</li>
+                        <li>Nulla volutpat aliquam velit</li>
+                        <li>Faucibus porta lacus fringilla vel</li>
+                        <li>Aenean sit amet erat nunc</li>
+                        <li>Eget porttitor lorem</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+    <div  style="position: absolute;left: 300px;top: 0;right: 0;width: 1000px">
+        <div>
+            <div class="col-md-8">
+                <div class="article-list">
+                    <div class="article-item clearfix">
+                        <h1>{{ obj.a_title }}</h1>
+                        {{ obj.a_text|safe }}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+</div>
+</body>
+</html>

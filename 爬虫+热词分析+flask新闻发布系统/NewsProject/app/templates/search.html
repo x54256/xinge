@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/static/js/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/home_5a30939.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/layout_5fcc025.css">
+    <link rel="stylesheet" type="text/css" href="/static/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css">
+</head>
+<body style="overflow-y:auto">
+
+
+<div class="y-wrap">
+    <div id="header">
+        <div riot-tag="wtopbar" style="height: 34px; background: #222;">
+            <div class="y-box wtopbar">
+                <ul class="y-left">
+                    <a href="#" class="navbar-brand"><img class="img" src="https://s3.pstatp.com/toutiao/static/img/logo.201f80d.png" alt="logo"/></a>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/all">全部</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_hots">热点</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_tech">科技</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_entertainment">娱乐</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_game">游戏</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_sports">体育</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_car">汽车</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_finance">财经</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_world">国际</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_baby">育儿</a></li>
+                    <li class="tb-item"><a class="tb-link" href="/toutiao/news_military">军事</a></li>
+                </ul>
+                <ul class="y-right">
+                    <li class="tb-item userbox">
+                        <div riot-tag="wuserbox" abtype="0" pageid="/news_society/">
+                            <div class="y-box wuserbox">
+                                <div class="nav-login"><a ga_event="nav_login" href="javascript:;"> <span>登录</span> </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="tb-item"><a class="tb-link" href="javascript:void(0)">反馈</a></li>
+                    <li class="tb-item"><a class="tb-link" href="#" ga_event="mh_nav_complain" target="_blank">投诉侵权</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="container" style="position: relative;min-width: 800px;">
+    <div class="col-md-4" style="width: 300px;position: absolute;left: 0;top: 0 ;">
+            <div class="panel panel-default hot-recommend">
+                <div class="panel-heading">今日热词</div>
+                <div class="panel-body">
+                    <ul class="list-unstyled">
+                        {% for i in top_10 %}
+                            <a href="/toutiao/search?keyword={{ i[1] }}"><li>{{ loop.index }}、{{ i[1] }}</li></a>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="panel panel-default hot-comment">
+                <div class="panel-heading">热门搜索排行</div>
+                <div class="panel-body">
+                    <ul class="list-unstyled">
+                        <li>Lorem ipsum dolor sit amet</li>
+                        <li>Consectetur adipiscing elit</li>
+                        <li>Integer molestie lorem at massa</li>
+                        <li>Facilisis in pretium nisl aliquet</li>
+                        <li>Nulla volutpat aliquam velit</li>
+                        <li>Faucibus porta lacus fringilla vel</li>
+                        <li>Aenean sit amet erat nunc</li>
+                        <li>Eget porttitor lorem</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+
+    <div  style="position: absolute;left: 300px;top: 0;right: 0;width: 670px">
+        <div>
+            <div class="feedBox">
+            <div class="wcommonFeed">
+                <div riot-tag="msgAlert" mwidth="660" mtop="500" category="news_society">
+                    <div class="msgAlert msgAlert-hidden">
+                        <div style="background-color: #fff; height: 1px;"></div>
+                    </div>
+                </div>
+
+                <ul>
+
+                    {% for i in obj %}
+                        <li class="item">
+                            <span id="ad_extra" style="display:none;"></span>
+                            <div >
+                                <div class="normal rbox ">
+                                    <div class="rbox-inner">
+                                        <div class="title-box" ga_event="article_title_click"><a class="link title" target="_blank"href="/toutiao/{{ i.id }}">{{ i.a_title }}</a></div>
+                                        <div class="y-box footer">
+                                            <span class="lbtn">{{ i.a_time }} 时发布</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lbox" ga_event="article_img_click"><a class="img-wrap" target="_blank"href="/toutiao/{{ i.id }}"> <img alt="" src="{{ i.a_img_url }}"></a></div>
+                        </li>
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+            <div class="clearfix">
+                <ul class="pagination">
+                    {{ page_str|safe }}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+
+
+
+</div>
+</body>
+</html>
